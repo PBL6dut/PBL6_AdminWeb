@@ -1,55 +1,54 @@
 import { Heading } from "../components/ui/Heading";
 import { FaPlus } from "react-icons/fa6";
-import { CardGroup } from "./ui-group/CardGroup";
 import { Card } from "../components/ui/Card";
 import {
   FaCube,
-  FaCartShopping,
-  FaUsers,
-  FaChartColumn,
-  FaTableColumns,
-  FaArrowRightFromBracket,
   FaCircle,
-  FaEye,
-  FaPenToSquare,
-  FaRegTrashCan,
 } from "react-icons/fa6";
 import { Table } from "../components/ui/Table";
 import { SearchInput } from "../components/ui/SearchInput";
+import { IconButton } from "../components/ui/Button";
+import { useContext } from "react";
+import DataContext from "../contexts/DataContext";
+import ModalContext from "../contexts/ModalContext";
 
 export const Products = () => {
   const cards = [
-    { title: "Tổng sản phẩm", content: "6", Icon: {icon: FaCube, color: "text-blue-700"} },
-    { title: "Đang bán", content: "4", Icon: {icon: FaCircle, color: "text-green-700"} },
-    { title: "Sắp hết hàng", content: "1", Icon: {icon: FaCircle, color: "text-yellow-400"} },
-    { title: "Hết hàng", content: "2", Icon: {icon: FaCircle, color: "text-red-600"} },
+    { title: "Tổng sản phẩm", content: "6", Icon: {icon: FaCube, color: "text-blue-600"} },
+    { title: "Đang bán", content: "4", Icon: {icon: FaCircle, color: "text-green-600", size: "w-2 h-2"} },
+    { title: "Sắp hết hàng", content: "1", Icon: {icon: FaCircle, color: "text-yellow-400", size: "w-2 h-2"} },
+    { title: "Hết hàng", content: "2", Icon: {icon: FaCircle, color: "text-red-600", size: "w-2 h-2"} },
   ];
+
+  const { data, chooseObject, setChooseObject } = useContext(DataContext);
+  const { products } = data || [];
 
   const table = {
     headings: ["Sản phẩm", "Danh mục", "Giá", "Tồn kho", "Trạng thái"],
-    data: [
-      {
-        name: "Ghế da cao cấp",
-        category: "Ghế sofa",
-        price: "12500000đ",
-        stock_quantity: 15,
-        status: "Đang bán",
+    data: products
+  };
+
+  const { modals, openModal, closeModal, closeAllModals } =
+    useContext(ModalContext);
+  const { form, detail, confirm } = modals;
+
+  const handleDelete = ( {object} ) => {
+    openModal("confirm", {
+      message: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      onConfirm: () => {
+        alert("Đã xoá sản phẩm thành công")
+        closeModal("confirm");
       },
-      {
-        name: "Bộ bàn ăn 6 ghế gỗ sồi",
-        category: "Bàn ăn",
-        price: "8900000đ",
-        stock_quantity: 8,
-        status: "Đang bán",
-      },
-      {
-        name: "Tủ quần áo 3 cánh gỗ tự nhiên",
-        category: "Tủ quần áo",
-        price: "15200000đ",
-        stock_quantity: 5,
-        status: "Đang bán",
-      },
-    ],
+    });
+    console.log("handledelete")
+    console.log(confirm)
+  };
+
+  const handleView = ( {object} ) => {
+    openModal("detail", {
+      data: object,
+      labels: ["Tên", "Danh mục", "Giá", "Số lượng hàng tồn kho", "Trạng thái"],
+    });
   };
 
   return (
@@ -90,93 +89,17 @@ export const Products = () => {
         {table && (
           <Table
             data={table}
-            Icons={[
-              { icon: FaEye },
-              { icon: FaPenToSquare, color: "text-green-700" },
-              { icon: FaRegTrashCan, color: "text-red-700" },
-            ]}
+            renderActions={(item) => (
+              <>
+                <IconButton iconType="view" handleClick={() => handleView({ object: item })} />
+                <IconButton iconType="edit" />
+                <IconButton iconType="delete" handleClick={() => handleDelete({ object: item })} />
+              </>
+            )}
           />
         )}
       </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-      </div>
       <div class="flex items-center justify-center h-48 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800">
         <p class="text-2xl text-gray-400 dark:text-gray-500">
           <svg
@@ -195,84 +118,6 @@ export const Products = () => {
             />
           </svg>
         </p>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
       </div>
     </>
   );

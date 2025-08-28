@@ -1,4 +1,11 @@
 import clsx from "clsx";
+import {
+  FaEye,
+  FaPenToSquare,
+  FaRegTrashCan,
+} from "react-icons/fa6";
+import DataContext from "../../contexts/DataContext";
+import { useContext } from "react";
 
 const variantClasses = {
   default: "cursor-pointer text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
@@ -32,6 +39,41 @@ export const Button = ({
     >
       {Icon && <span className="inline-block mr-2">{<Icon />}</span>}
       {children}
+    </button>
+  );
+};
+
+export const IconButton = ({ iconType, object, handleClick, ...props }) => {
+  let Icon;
+  let color;
+  const { choosenObject, setChoosenObject } = useContext(DataContext);
+  switch(iconType) {
+    case "edit":
+      Icon = FaPenToSquare;
+      color = "text-green-700";
+      break;
+    case "delete":
+      Icon = FaRegTrashCan;
+      color = "text-red-700";
+      break;
+    case "view":
+      Icon = FaEye;
+      color = "text-black";
+      break;
+    default:
+      Icon = FaEye;
+  }
+  return (
+    <button
+      onClick= {() => {
+        setChoosenObject(object)
+        handleClick(choosenObject)
+      }}
+      type="button"
+      className="cursor-pointer mx-2"
+      {...props}
+    >
+      {Icon && <Icon className={`${color} inline-block w-4 h-4`} />}
     </button>
   );
 };
