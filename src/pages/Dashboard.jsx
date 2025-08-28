@@ -1,6 +1,5 @@
 import { Heading } from "../components/ui/Heading";
 import { FaPlus } from "react-icons/fa6";
-import { CardGroup } from "./ui-group/CardGroup";
 import { Card } from "../components/ui/Card";
 import {
   FaCube,
@@ -25,10 +24,10 @@ import {
 
 export const Dashboard = () => {
   const cards = [
-    { title: "Tổng sản phẩm", content: "1234", Icon: {icon: FaCube, color: "text-blue-700"} },
-    { title: "Đơn hàng mới", content: "5678", Icon: {icon: FaCartShopping, color: "text-green-700"} },
-    { title: "Khách hàng", content: "91011", Icon: {icon: FaUsers, color: "text-purple-700"} },
-    { title: "Doanh thu", content: "121314", Icon: {icon: FaChartColumn, color: "text-orange-700"} },
+    { title: "Tổng sản phẩm", content: "1234", Icon: {icon: FaCube, color: "text-blue-600"} },
+    { title: "Đơn hàng mới", content: "5678", Icon: {icon: FaCartShopping, color: "text-green-600"} },
+    { title: "Khách hàng", content: "91011", Icon: {icon: FaUsers, color: "text-purple-600"} },
+    { title: "Doanh thu", content: "121314", Icon: {icon: FaChartColumn, color: "text-orange-600"} },
   ];
 
   const area_chart = [
@@ -154,7 +153,7 @@ export const Dashboard = () => {
                 bottom: 0,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              {/* <CartesianGrid strokeDasharray="3 3" /> */}
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
@@ -162,7 +161,7 @@ export const Dashboard = () => {
                 type="monotone"
                 dataKey="uv"
                 stroke="#8884d8"
-                fill="black"
+                fill="rgba(47, 79, 79, 1)"
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -185,7 +184,7 @@ export const Dashboard = () => {
               <XAxis dataKey="name" className="text-sm"/>
               <YAxis />
               <Tooltip />
-              <Bar dataKey="uv" fill="#8884d8" />
+              <Bar dataKey="uv" fill="rgba(0, 0, 139, 1)" />
             </BarChart>
           </ResponsiveContainer>
         </div>

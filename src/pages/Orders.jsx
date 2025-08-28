@@ -1,6 +1,5 @@
 import { Heading } from "../components/ui/Heading";
 import { FaPlus } from "react-icons/fa6";
-import { CardGroup } from "./ui-group/CardGroup";
 import { Card } from "../components/ui/Card";
 import {
   FaCube,
@@ -18,16 +17,42 @@ import {
 } from "react-icons/fa6";
 import { Table } from "../components/ui/Table";
 import { SearchInput } from "../components/ui/SearchInput";
+import { IconButton } from "../components/ui/Button";
+import { useContext } from "react";
+import DataContext from "../contexts/DataContext";
 
 export const Orders = () => {
   const cards = [
-    { title: "Tổng đơn", content: "6", Icon: {icon: FaCube} },
-    { title: "Chờ xử lý", content: "1", Icon: {icon: FaRegClock, color: "text-yellow-700 "} },
-    { title: "Đang xử lý", content: "2", Icon: {icon: FaCube, color: "text-purple-700"} },
-    { title: "Đang giao", content: "1", Icon: {icon: FaTruck, color: "text-orange-700"} },
-    { title: "Hoàn thành", content: "1", Icon: {icon: FaRegCircleCheck , color: "text-green-700"} },
-    { title: "Đã huỷ", content: "1", Icon: {icon: FaRegCircleXmark, color: "text-red-700"} },
+    { title: "Tổng đơn", content: "6", Icon: { icon: FaCube } },
+    {
+      title: "Chờ xử lý",
+      content: "1",
+      Icon: { icon: FaRegClock, color: "text-yellow-600 " },
+    },
+    {
+      title: "Đang xử lý",
+      content: "2",
+      Icon: { icon: FaCube, color: "text-purple-600" },
+    },
+    {
+      title: "Đang giao",
+      content: "1",
+      Icon: { icon: FaTruck, color: "text-orange-600" },
+    },
+    {
+      title: "Hoàn thành",
+      content: "1",
+      Icon: { icon: FaRegCircleCheck, color: "text-green-600" },
+    },
+    {
+      title: "Đã huỷ",
+      content: "1",
+      Icon: { icon: FaRegCircleXmark, color: "text-red-600" },
+    },
   ];
+
+  const { data } = useContext(DataContext);
+  const { orders } = data || [];
 
   const table = {
     headings: [
@@ -37,29 +62,7 @@ export const Orders = () => {
       "Tổng tiền",
       "Trạng thái",
     ],
-    data: [
-      {
-        code: "ORD-2024-001",
-        customer: "Nguyễn Văn An",
-        product: "Ghế sofa cao cấp",
-        total: "15.700.000₫",
-        status: "Chờ xác nhận",
-      },
-      {
-        code: "ORD-2024-002",
-        customer: "Trần Thị Bình",
-        product: "Bộ bàn ăn gỗ sồi 6 ghế",
-        total: "8.900.000₫",
-        status: "Đã xác nhận",
-      },
-      {
-        code: "ORD-2024-003",
-        customer: "Lê Minh Cường",
-        product: "Tủ quần áo 3 cánh gỗ tự nhiên ",
-        total: "24.200.000₫",
-        status: "Đang xử lý",
-      },
-    ],
+    data: orders
   };
 
   return (
@@ -97,9 +100,9 @@ export const Orders = () => {
         {table && (
           <Table
             data={table}
-            Icons={[
-              { icon: FaEye },
-              { icon: FaPenToSquare, color: "text-green-700" },
+            IconButtons={[
+              <IconButton iconType="view" />,
+              <IconButton iconType="edit" />,
             ]}
           />
         )}
