@@ -1,4 +1,5 @@
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import DataContext from "./DataContext";
 
 const ModalContext = createContext();
   
@@ -8,6 +9,8 @@ export const ModalProvider = ({ children }) => {
     confirm: { isOpen: false, context: null },
     detail: { isOpen: false, context: null },
   });
+
+  const { setChoosenObject } = useContext(DataContext);
 
   // Generic modal actions
   const openModal = useCallback((modalType, context = null) => {
@@ -22,6 +25,7 @@ export const ModalProvider = ({ children }) => {
       ...prev,
       [modalType]: { isOpen: false, context: null },
     }));
+    setChoosenObject(null);
   }, []);
 
   const closeAllModals = useCallback(() => {

@@ -37,7 +37,6 @@ export const Button = ({
       )}
       {...props}
     >
-      {Icon && <span className="inline-block mr-2">{<Icon />}</span>}
       {children}
     </button>
   );
