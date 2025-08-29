@@ -23,6 +23,22 @@ export const DataProvider = ({ children }) => {
     }
     const [choosenObject, setChoosenObject] = useState(null);
 
+    const deleteObject = (field, object) => {
+        setData(prevData => {
+            const newData = { ...prevData };
+            newData[field] = newData[field].filter(item => item !== object);
+            return newData;
+        });
+    }
+
+    const editObject = (field, oldObject, newObject) => {
+        setData(prevData => {
+            const newData = { ...prevData };
+            newData[field] = newData[field].map(item => item === oldObject ? newObject : item);
+            return newData;
+        });
+    }
+
     useEffect(() => {
         setData(fakeData)
     }, [])
@@ -30,7 +46,7 @@ export const DataProvider = ({ children }) => {
     console.log(data)
 
     return(
-        <DataContext.Provider value={{ data, setData, choosenObject, setChoosenObject }}>
+        <DataContext.Provider value={{ data, setData, choosenObject, setChoosenObject, deleteObject, editObject }}>
             {children}
         </DataContext.Provider>
     )

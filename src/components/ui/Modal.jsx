@@ -199,6 +199,7 @@ export const Modals = () => {
         <ConfirmModal
           isOpen={confirm.isOpen}
           onClose={() => closeModal("confirm")}
+          type={confirm.context.type || "default"}
           message={confirm.context.message || ""}
           onConfirm={confirm.context.onConfirm || (() => {})}
         />

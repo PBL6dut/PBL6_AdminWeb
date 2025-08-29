@@ -7,25 +7,29 @@ import { Users } from "./pages/Users";
 import { ModalProvider } from "./contexts/ModalContext";
 import { DataProvider } from "./contexts/DataContext";
 import { Modals } from "./components/ui/Modal";
+import { ResourcePageProvider } from "./contexts/ResourcePageContext";
+import { Resource } from "./pages/Resource";
 
 function App() {
   return (
     <DataProvider>
       <ModalProvider>
         <BrowserRouter>
-          <div className="min-h-screen bg-gray-100">
-            <Routes>
-              <Route path="/dashboard" element={<MainLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="products" element={<Products />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="users" element={<Users />} />
-              </Route>
-            </Routes>
+          <ResourcePageProvider>
+            <div className="min-h-screen bg-gray-100">
+              <Routes>
+                <Route path="/dashboard" element={<MainLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="products" element={<Resource />} />
+                  <Route path="orders" element={<Resource />} />
+                  <Route path="users" element={<Resource />} />
+                </Route>
+              </Routes>
 
-            {/* <Modals /> */}
-          </div>
-          <Modals />
+              {/* <Modals /> */}
+            </div>
+            <Modals />
+          </ResourcePageProvider>
         </BrowserRouter>
       </ModalProvider>
     </DataProvider>
