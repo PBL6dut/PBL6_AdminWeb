@@ -22,6 +22,9 @@ export const Table = ({ data, renderActions }) => {
   tableData = data && data.data;
   const values = tableData && Object.values(tableData[0]);
 
+  let renderedRows = [];
+  renderedRows = data && data.renderedRows;
+
   return (
     <div class="relative overflow-x-auto border-[#609966] dark:border-gray-700 rounded-lg">
       <table class="w-full text-md text-left border-2 border-[#609966] rtl:text-right text-gray-500 dark:text-gray-400">
@@ -41,10 +44,9 @@ export const Table = ({ data, renderActions }) => {
                 key={index}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
               >
-                {values &&
-                  values.map((value, index) => (
-                    <DetailRow key={index} value={value} />
-                  ))}
+                {renderedRows(item) && renderedRows(item).map((renderedRow, index) => (
+                  <DetailRow key={index} value={renderedRow} />
+                ))}
                 {renderActions && (
                   <td className="py-4 text-gray-900 bg-[#EDF1D6]">{renderActions(item)}</td>
                 )}

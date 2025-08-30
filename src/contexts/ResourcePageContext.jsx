@@ -15,6 +15,7 @@ import {
 import DataContext from "./DataContext";
 import ModalContext from "./ModalContext";
 import { useLocation } from "react-router-dom";
+import avatarDefault from "../assets/avatar-default.jpg";
 
 const ResourcePageContext = createContext();
 
@@ -23,13 +24,9 @@ export const ResourcePageProvider = ({ children }) => {
 
   const { data, deleteObject } = useContext(DataContext);
 
-  const { 
-    modals, 
-    openModal, 
-    closeModal, 
-    closeAllModals 
-  } = useContext(ModalContext);
-  
+  const { modals, openModal, closeModal, closeAllModals } =
+    useContext(ModalContext);
+
   const { form, detail, confirm } = modals;
 
   const headingByType = {
@@ -130,10 +127,24 @@ export const ResourcePageProvider = ({ children }) => {
   const tableByType = {
     products: {
       headings: ["Sản phẩm", "Danh mục", "Giá", "Tồn kho", "Trạng thái"],
-      data: data && data.products || [],
-      renderedRow: [
-        
-      ]
+      data: (data && data.products) || [],
+      renderedRows: (item) => [
+        <div className="flex">
+          <img
+            className="size-12 mr-2 rounded-lg"
+            src={item.image || "N/A"}
+            alt={item.name || "N/A"}
+          />
+          <div>
+            <p>{item.name || "N/A"}</p>
+            <p>Tạo: {item.created_at || "N/A"}</p>
+          </div>
+        </div>,
+        <>{item.category || "N/A"}</>,
+        <>{item.price || "N/A"}</>,
+        <>{item.stock_quantity || "N/A"}</>,
+        <>{item.status || "N/A"}</>,
+      ],
     },
 
     orders: {
@@ -144,7 +155,20 @@ export const ResourcePageProvider = ({ children }) => {
         "Tổng tiền",
         "Trạng thái",
       ],
-      data: data && data.orders || [],
+      data: (data && data.orders) || [],
+      renderedRows: (item) => [
+        <div>
+          <p>{item.id || "N/A"}</p>
+          <p>{item.delivery_date || "N/A"}</p>
+        </div>,
+        <div>
+          <p>{item.customer.name || "N/A"}</p>
+          <p>{item.customer.phone || "N/A"}</p>
+        </div>,
+        <>{item.products || "N/A"}</>,
+        <>{item.total || "N/A"}</>,
+        <>{item.status || "N/A"}</>,
+      ],
     },
 
     users: {
@@ -155,7 +179,27 @@ export const ResourcePageProvider = ({ children }) => {
         "Tổng chi tiêu",
         "Đơn gần nhất",
       ],
-      data: data && data.users || [],
+      data: (data && data.users) || [],
+      renderedRows: (item) => [
+        <div className="flex">
+          <img
+            className="size-12 mr-2 rounded-3xl"
+            src={item.avatar || avatarDefault}
+            alt="avatar"
+          />
+          <div>
+            <p>{item.name || "N/A"}</p>
+            <p>Tham gia: {item.created_at || "N/A"}</p>
+          </div>
+        </div>,
+        <div>
+          <p>{item.email || "N/A"}</p>
+          <p>{item.phone || "N/A"}</p>
+        </div>,
+        <>{item.total_orders || "N/A"}</>,
+        <>{item.total_cost || "N/A"}</>,
+        <>{item.latest_order || "N/A"}</>,
+      ],
     },
   };
 
@@ -211,7 +255,7 @@ export const ResourcePageProvider = ({ children }) => {
           "Đơn gần nhất",
         ],
       });
-    }
+    },
   };
 
   const contextByType = {
@@ -248,12 +292,12 @@ export const ResourcePageProvider = ({ children }) => {
     data && setContext(contextByType[path]);
   }, [data, path]);
 
-  if(!data){
-    return <div>Loading...</div>
+  if (!data) {
+    return <div>Loading...</div>;
   }
 
   return (
-    <ResourcePageContext.Provider value={{context}}>
+    <ResourcePageContext.Provider value={{ context }}>
       {children}
     </ResourcePageContext.Provider>
   );

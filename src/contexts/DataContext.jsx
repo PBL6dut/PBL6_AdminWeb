@@ -41,7 +41,7 @@ export const DataProvider = ({ children }) => {
       {
         id: "ORD-2024-001",
         delivery_date: "27/1/2024",
-        customers: {name: "Nguyễn Văn An", phone: "0901234567"},
+        customer: {name: "Nguyễn Văn An", phone: "0901234567"},
         products: "Ghế sofa cao cấp",
         total: "15.700.000₫",
         status: "Chờ xác nhận",
@@ -49,14 +49,14 @@ export const DataProvider = ({ children }) => {
       {
         id: "ORD-2024-002",
         delivery_date: "25/1/2024",
-        customers: {name: "Trần Thị Bình", phone: "0912345678"},
+        customer: {name: "Trần Thị Bình", phone: "0912345678"},
         products: "Bộ bàn ăn gỗ sồi 6 ghế",
         total: "8.900.000₫",
         status: "Đã xác nhận",
       },
       {
         id: "ORD-2024-003",
-        customers: {name: "Lê Minh Cường", phone: "0923456789"},
+        customer: {name: "Lê Minh Cường", phone: "0923456789"},
         products: "Tủ quần áo 3 cánh gỗ tự nhiên",
         total: "24.200.000₫",
         status: "Đang xử lý",
