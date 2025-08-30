@@ -5,8 +5,12 @@ import { Card } from "../components/ui/Card";
 import { Table } from "../components/ui/Table";
 import { IconButton } from "../components/ui/Button";
 import { SearchInput } from "../components/ui/SearchInput";
+import { useLocation } from "react-router-dom";
 
 export const Resource = () => {
+  const location = useLocation();
+  const path = location.pathname.replace("/dashboard/", "");
+
   const { context } = useContext(ResourcePageContext);
   if (!context) {
     return <div>Loading...</div>;
@@ -57,10 +61,12 @@ export const Resource = () => {
                   handleClick={() => onView({ object: item })}
                 />
                 <IconButton iconType="edit" />
-                <IconButton
-                  iconType="delete"
-                  handleClick={() => onDelete({ object: item })}
-                />
+                {path === "products" && (
+                  <IconButton
+                    iconType="delete"
+                    handleClick={() => onDelete({ object: item })}
+                  />
+                )}
               </>
             )}
           />

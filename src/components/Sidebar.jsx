@@ -37,7 +37,7 @@ export const Sidebar = () => {
               <SidebarButton label="Khách hàng" Icon={FaUsers} path="users" selected={path === "users"}/>
             </li>
             <li>
-              <SidebarButton label="Phân tích AI" Icon={FaChartColumn} />
+              <SidebarButton label="Phân tích AI" Icon={FaChartColumn} path="ai-analysis" selected={path === "ai-analysis"}/>
             </li>
           </ul>
           <div className="absolute bottom-4">
