@@ -20,7 +20,7 @@ export const Table = ({ data, renderActions }) => {
 
   let tableData = [];
   tableData = data && data.data;
-  const keys = tableData && Object.keys(tableData[0]);
+  const values = tableData && Object.values(tableData[0]);
 
   return (
     <div class="relative overflow-x-auto border-[#609966] dark:border-gray-700 rounded-lg">
@@ -41,9 +41,9 @@ export const Table = ({ data, renderActions }) => {
                 key={index}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
               >
-                {keys &&
-                  keys.map((key, index) => (
-                    <DetailRow key={index} value={item[key]} />
+                {values &&
+                  values.map((value, index) => (
+                    <DetailRow key={index} value={value} />
                   ))}
                 {renderActions && (
                   <td className="py-4 text-gray-900 bg-[#EDF1D6]">{renderActions(item)}</td>

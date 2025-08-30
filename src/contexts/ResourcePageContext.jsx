@@ -19,11 +19,9 @@ import { useLocation } from "react-router-dom";
 const ResourcePageContext = createContext();
 
 export const ResourcePageProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
   const [context, setContext] = useState(null);
 
   const { data, deleteObject } = useContext(DataContext);
-
 
   const { 
     modals, 
@@ -133,6 +131,9 @@ export const ResourcePageProvider = ({ children }) => {
     products: {
       headings: ["Sản phẩm", "Danh mục", "Giá", "Tồn kho", "Trạng thái"],
       data: data && data.products || [],
+      renderedRow: [
+        
+      ]
     },
 
     orders: {

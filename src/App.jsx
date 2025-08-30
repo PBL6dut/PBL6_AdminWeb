@@ -1,14 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Dashboard } from "./pages/Dashboard";
-import { Products } from "./pages/Products";
-import { Orders } from "./pages/Orders";
-import { Users } from "./pages/Users";
 import { ModalProvider } from "./contexts/ModalContext";
 import { DataProvider } from "./contexts/DataContext";
 import { Modals } from "./components/ui/Modal";
 import { ResourcePageProvider } from "./contexts/ResourcePageContext";
 import { Resource } from "./pages/Resource";
+import { AIAnalysis } from "./pages/AIAnalysis";
 
 function App() {
   return (
@@ -23,10 +21,9 @@ function App() {
                   <Route path="products" element={<Resource />} />
                   <Route path="orders" element={<Resource />} />
                   <Route path="users" element={<Resource />} />
+                  <Route path="ai-analysis" element={<AIAnalysis />} />
                 </Route>
               </Routes>
-
-              {/* <Modals /> */}
             </div>
             <Modals />
           </ResourcePageProvider>
