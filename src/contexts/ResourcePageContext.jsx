@@ -16,16 +16,19 @@ import DataContext from "./DataContext";
 import ModalContext from "./ModalContext";
 import { useLocation } from "react-router-dom";
 import avatarDefault from "../assets/avatar-default.jpg";
+import furnitureDefault from "../assets/furniture-default.png";
+import { calculateSum, findNameById, formatDate, formatPrice } from "../utils";
+import { StatusBadge } from "../components/ui/StatusBadge";
+import { useContextName } from "../hooks/useContextName";
 
 const ResourcePageContext = createContext();
 
 export const ResourcePageProvider = ({ children }) => {
   const [context, setContext] = useState(null);
 
-  const { data, deleteObject } = useContext(DataContext);
+  const { data, deleteObject, isLoading } = useContext(DataContext);
 
-  const { modals, openModal, closeModal, closeAllModals } =
-    useContext(ModalContext);
+  const { modals, openModal, closeModal } = useContext(ModalContext);
 
   const { form, detail, confirm } = modals;
 
@@ -37,9 +40,9 @@ export const ResourcePageProvider = ({ children }) => {
     orders: {
       title: "Quản lý đơn hàng",
     },
-    users: {
-      title: "Quản lý người dùng",
-      button: { context: "Thêm người dùng", Icon: FaPlus },
+    customers: {
+      title: "Quản lý khách hàng",
+      button: { context: "Thêm khách hàng", Icon: FaPlus },
     },
   };
 
@@ -47,12 +50,12 @@ export const ResourcePageProvider = ({ children }) => {
     products: [
       {
         title: "Tổng sản phẩm",
-        content: "6",
+        content: data.products.length || "0",
         Icon: { icon: FaCube, color: "text-blue-600" },
       },
       {
         title: "Đang bán",
-        content: "4",
+        content: data.products.filter((p) => p.status === "active").length || "0",
         Icon: { icon: FaCircle, color: "text-green-600", size: "w-2 h-2" },
       },
       {
@@ -62,15 +65,21 @@ export const ResourcePageProvider = ({ children }) => {
       },
       {
         title: "Hết hàng",
-        content: "2",
+        content:
+          data.products.filter((p) => p.status === "inactive").length || "0",
         Icon: { icon: FaCircle, color: "text-red-600", size: "w-2 h-2" },
       },
     ],
     orders: [
-      { title: "Tổng đơn", content: "6", Icon: { icon: FaCube } },
+      {
+        title: "Tổng đơn",
+        content: data.orders.length || "0",
+        Icon: { icon: FaCube },
+      },
       {
         title: "Chờ xử lý",
-        content: "1",
+        content:
+          data.orders.filter((o) => o.status === "pending").length || "0",
         Icon: { icon: FaRegClock, color: "text-yellow-600 " },
       },
       {
@@ -80,22 +89,29 @@ export const ResourcePageProvider = ({ children }) => {
       },
       {
         title: "Đang giao",
-        content: "1",
+        content:
+          data.orders.filter((o) => o.status === "shipping").length || "0",
         Icon: { icon: FaTruck, color: "text-orange-600" },
       },
       {
         title: "Hoàn thành",
-        content: "1",
+        content:
+          data.orders.filter((o) => o.status === "completed").length || "0",
         Icon: { icon: FaRegCircleCheck, color: "text-green-600" },
       },
       {
         title: "Đã huỷ",
-        content: "1",
+        content:
+          data.orders.filter((o) => o.status === "cancelled").length || "0",
         Icon: { icon: FaRegCircleXmark, color: "text-red-600" },
       },
     ],
-    users: [
-      { title: "Tổng KH", content: "6", Icon: { icon: FaUsers } },
+    customers: [
+      {
+        title: "Tổng KH",
+        content: data.customers.length || "0",
+        Icon: { icon: FaUsers },
+      },
       {
         title: "KH mới",
         content: "1",
@@ -132,18 +148,19 @@ export const ResourcePageProvider = ({ children }) => {
         <div className="flex">
           <img
             className="size-12 mr-2 rounded-lg"
-            src={item.image || "N/A"}
-            alt={item.name || "N/A"}
+            src={item.image_url || furnitureDefault}
+            alt={"ảnh"}
+            onError={e => { e.target.src = furnitureDefault; }}
           />
           <div>
             <p>{item.name || "N/A"}</p>
-            <p>Tạo: {item.created_at || "N/A"}</p>
+            <p>Tạo: {formatDate(item.created_at) || "N/A"}</p>
           </div>
         </div>,
-        <>{item.category || "N/A"}</>,
-        <>{item.price || "N/A"}</>,
+        <>{item.category.name || "N/A"}</>,
+        <>{formatPrice(item.price) || "N/A"}</>,
         <>{item.stock_quantity || "N/A"}</>,
-        <>{item.status || "N/A"}</>,
+        <>{<StatusBadge>{item.status}</StatusBadge> || "N/A"}</>,
       ],
     },
 
@@ -158,20 +175,31 @@ export const ResourcePageProvider = ({ children }) => {
       data: (data && data.orders) || [],
       renderedRows: (item) => [
         <div>
-          <p>{item.id || "N/A"}</p>
-          <p>{item.delivery_date || "N/A"}</p>
+          <p>{item.order_number || "N/A"}</p>
+          <p>{item.order_date || "N/A"}</p>
         </div>,
         <div>
-          <p>{item.customer.name || "N/A"}</p>
+          <p>{item.customer.full_name || "N/A"}</p>
           <p>{item.customer.phone || "N/A"}</p>
         </div>,
-        <>{item.products || "N/A"}</>,
-        <>{item.total || "N/A"}</>,
-        <>{item.status || "N/A"}</>,
+        <>
+          <p>{item.order_details.length + " sản phẩm" || "N/A"}</p>
+          <p className="text-xs">
+            {findNameById(
+              "products",
+              item.order_details[0].product_id,
+              data.products
+            )}{" "}
+            {item.order_details.length > 1 &&
+              ` + ${item.order_details.length - 1} sản phẩm khác`}
+          </p>
+        </>,
+        <>{formatPrice(item.total_amount) || "N/A"}</>,
+        <>{<StatusBadge>{item.status}</StatusBadge> || "N/A"}</>,
       ],
     },
 
-    users: {
+    customers: {
       headings: [
         "Tên khách hàng",
         "Liên hệ",
@@ -179,27 +207,83 @@ export const ResourcePageProvider = ({ children }) => {
         "Tổng chi tiêu",
         "Đơn gần nhất",
       ],
-      data: (data && data.users) || [],
+      data: (data && data.customers) || [],
       renderedRows: (item) => [
         <div className="flex">
           <img
             className="size-12 mr-2 rounded-3xl"
             src={item.avatar || avatarDefault}
             alt="avatar"
+            onError={e => { e.target.src = avatarDefault; }}
           />
           <div>
-            <p>{item.name || "N/A"}</p>
-            <p>Tham gia: {item.created_at || "N/A"}</p>
+            <p>{item.full_name || "N/A"}</p>
+            <p>Tham gia: {formatDate(item.created_at) || "N/A"}</p>
           </div>
         </div>,
         <div>
           <p>{item.email || "N/A"}</p>
           <p>{item.phone || "N/A"}</p>
         </div>,
-        <>{item.total_orders || "N/A"}</>,
-        <>{item.total_cost || "N/A"}</>,
-        <>{item.latest_order || "N/A"}</>,
+        <>{item.orders.length}</>,
+        <>
+          {formatPrice(
+            calculateSum(item.orders.map((order) => order.total_amount))
+          ) || "N/A"}
+        </>,
+        <>
+          {(item.orders.length && formatDate(item.orders.at(-1).order_date)) ||
+            "N/A"}
+        </>,
       ],
+    },
+  };
+
+  const formConfig = {
+    products: {
+      objectType: "products",
+      keys:
+        data && data.products && data.products.length > 0
+          ? Object.keys(data.products[0]).filter(
+              (key) => key !== "status" && key !== "created_at"
+            )
+          : [],
+      labels: ["Tên sản phẩm", "Hình ảnh", "Danh mục", "Giá", "Số lượng hàng"],
+      onSubmit: () => {
+        alert("Submitted");
+      },
+    },
+
+    orders: {
+      objectType: "orders",
+      keys:
+        data && data.orders && data.orders.length > 0
+          ? Object.keys(data.orders[0]).filter((key) => key !== "status")
+          : [],
+      labels: ["Mã đơn hàng", "Ngày giao hàng", "Khách hàng", "Tổng tiền"],
+      onSubmit: () => {
+        alert("Submitted");
+      },
+    },
+
+    customers: {
+      objectType: "customers",
+      keys:
+        data && data.customers && data.customers.length > 0
+          ? Object.keys(data.customers[0]).filter(
+              (key) => key !== "status" && key !== "created_at"
+            )
+          : [],
+      labels: [
+        "Tên khách hàng",
+        "Email",
+        "SĐT",
+        "Tổng chi tiêu",
+        "Đơn gần nhất",
+      ],
+      onSubmit: () => {
+        alert("Submitted");
+      },
     },
   };
 
@@ -219,42 +303,54 @@ export const ResourcePageProvider = ({ children }) => {
 
   const onViewByType = {
     products: ({ object }) => {
-      openModal("detail", {
-        data: object,
-        labels: [
-          "Tên",
-          "Danh mục",
-          "Giá",
-          "Số lượng hàng tồn kho",
-          "Trạng thái",
-        ],
-      });
+      openModal(
+        "detail",
+        {
+          data: object,
+          labels: [
+            "Tên",
+            "Danh mục",
+            "Giá",
+            "Số lượng hàng tồn kho",
+            "Trạng thái",
+          ],
+        },
+        "product"
+      );
     },
 
     orders: ({ object }) => {
-      openModal("detail", {
-        data: object,
-        labels: [
-          "Mã đơn hàng",
-          "Khách hàng",
-          "Sản phẩm",
-          "Tổng tiền",
-          "Trạng thái",
-        ],
-      });
+      openModal(
+        "detail",
+        {
+          data: object,
+          labels: [
+            "Mã đơn hàng",
+            "Khách hàng",
+            "Sản phẩm",
+            "Tổng tiền",
+            "Trạng thái",
+          ],
+        },
+        "order"
+      );
     },
 
-    users: ({ object }) => {
-      openModal("detail", {
-        data: object,
-        labels: [
-          "Tên khách hàng",
-          "Liên hệ",
-          "Tổng đơn hàng",
-          "Tổng chi tiêu",
-          "Đơn gần nhất",
-        ],
-      });
+    customers: ({ object }) => {
+      openModal(
+        "detail",
+        {
+          data: object,
+          labels: [
+            "Tên khách hàng",
+            "Liên hệ",
+            "Tổng đơn hàng",
+            "Tổng chi tiêu",
+            "Đơn gần nhất",
+          ],
+        },
+        "customer"
+      );
     },
   };
 
@@ -264,6 +360,7 @@ export const ResourcePageProvider = ({ children }) => {
       cards: cardsByType.products,
       table: tableByType.products,
       searchInputPlaceholder: "Tìm kiếm sản phẩm, SKU",
+      formConfig: formConfig.products,
       onDelete: onDeleteByType.products,
       onView: onViewByType.products,
     },
@@ -273,27 +370,29 @@ export const ResourcePageProvider = ({ children }) => {
       cards: cardsByType.orders,
       table: tableByType.orders,
       searchInputPlaceholder: "Tìm mã đơn, tên khách hàng, SĐT...",
+      formConfig: formConfig.orders,
       onView: onViewByType.orders,
     },
 
-    users: {
-      heading: headingByType.users,
-      cards: cardsByType.users,
-      table: tableByType.users,
+    customers: {
+      heading: headingByType.customers,
+      cards: cardsByType.customers,
+      table: tableByType.customers,
       searchInputPlaceholder: "Tìm mã đơn, tên khách hàng, SĐT...",
-      onView: onViewByType.users,
+      formConfig: formConfig.customers,
+      onView: onViewByType.customers,
     },
   };
 
-  const path = useLocation().pathname.replace("/dashboard/", "");
+  const path = useContextName();
   console.log("ResourcePageContext path:", path);
 
   useEffect(() => {
     data && setContext(contextByType[path]);
   }, [data, path]);
 
-  if (!data) {
-    return <div>Loading...</div>;
+  if (!data || isLoading) {
+    return null;
   }
 
   return (

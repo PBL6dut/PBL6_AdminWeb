@@ -1,6 +1,6 @@
 import { Heading } from "../components/ui/Heading";
 import { FaPlus } from "react-icons/fa6";
-import { Card } from "../components/ui/Card";
+import { Card, StatisticsCard } from "../components/ui/Card";
 import {
   FaCube,
   FaCartShopping,
@@ -128,7 +128,7 @@ export const Dashboard = () => {
           } gap-4 mb-4 h-auto`}
         >
           {cards.map((card, index) => (
-            <Card
+            <StatisticsCard
               key={index}
               title={card.title}
               Icon={card.Icon}
