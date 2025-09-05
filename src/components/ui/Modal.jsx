@@ -1,4 +1,4 @@
-import { use, useContext } from "react";
+import { useContext } from "react";
 import { Button } from "./Button";
 import {
   FaRegCircleXmark,
@@ -30,7 +30,7 @@ import {
   formatDate,
   formatPrice,
 } from "../../utils";
-import { Card, InformationCard, StatisticsCard } from "./Card";
+import { InformationCard, StatisticsCard } from "./Card";
 import DataContext from "../../contexts/DataContext";
 import { StatusBadge } from "./StatusBadge";
 
