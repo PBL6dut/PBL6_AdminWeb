@@ -14,7 +14,6 @@ import {
 } from "react-icons/fa6";
 import DataContext from "./DataContext";
 import ModalContext from "./ModalContext";
-import { useLocation } from "react-router-dom";
 import avatarDefault from "../assets/avatar-default.jpg";
 import furnitureDefault from "../assets/furniture-default.png";
 import { calculateSum, findNameById, formatDate, formatPrice } from "../utils";
