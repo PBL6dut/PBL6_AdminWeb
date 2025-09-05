@@ -20,7 +20,7 @@ function App() {
                   <Route index element={<Dashboard />} />
                   <Route path="products" element={<Resource />} />
                   <Route path="orders" element={<Resource />} />
-                  <Route path="users" element={<Resource />} />
+                  <Route path="customers" element={<Resource />} />
                   <Route path="ai-analysis" element={<AIAnalysis />} />
                 </Route>
               </Routes>

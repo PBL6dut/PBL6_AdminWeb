@@ -20,10 +20,17 @@ export const Table = ({ data, renderActions }) => {
 
   let tableData = [];
   tableData = data && data.data;
-  const values = tableData && Object.values(tableData[0]);
 
   let renderedRows = [];
   renderedRows = data && data.renderedRows;
+
+  if (!data || !data.data || data.data.length === 0) {
+    return (
+      <div className="p-4 text-2xl font-bold text-center text-red-500">
+        Không có dữ liệu
+      </div>
+    );
+  }
 
   return (
     <div class="relative overflow-x-auto border-[#609966] dark:border-gray-700 rounded-lg">
@@ -42,7 +49,7 @@ export const Table = ({ data, renderActions }) => {
             tableData.map((item, index) => (
               <tr
                 key={index}
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-[#609966]"
               >
                 {renderedRows(item) && renderedRows(item).map((renderedRow, index) => (
                   <DetailRow key={index} value={renderedRow} />

@@ -1,11 +1,12 @@
 import { useContext } from "react";
 import ResourcePageContext from "../contexts/ResourcePageContext";
 import { Heading } from "../components/ui/Heading";
-import { Card } from "../components/ui/Card";
+import { Card, StatisticsCard } from "../components/ui/Card";
 import { Table } from "../components/ui/Table";
 import { IconButton } from "../components/ui/Button";
 import { SearchInput } from "../components/ui/SearchInput";
 import { useLocation } from "react-router-dom";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 export const Resource = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ export const Resource = () => {
 
   const { context } = useContext(ResourcePageContext);
   if (!context) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   const { heading, cards, table, onDelete, onView } = context;
@@ -39,7 +40,7 @@ export const Resource = () => {
           } gap-4 mb-4 h-auto`}
         >
           {cards.map((card, index) => (
-            <Card
+            <StatisticsCard
               key={index}
               title={card.title}
               Icon={card.Icon}

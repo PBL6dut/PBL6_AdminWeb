@@ -9,7 +9,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 export const Sidebar = () => {
   const path = useLocation().pathname.replace("/dashboard/", "");
-  console.log(path)
+  console.log(path);
   return (
     <>
       <aside
@@ -25,19 +25,44 @@ export const Sidebar = () => {
 
           <ul className="space-y-2 font-medium">
             <li>
-              <SidebarButton label="Tổng quan" Icon={FaTableColumns} path="" selected={path === "/dashboard"}/>
+              <SidebarButton
+                label="Tổng quan"
+                Icon={FaTableColumns}
+                path=""
+                selected={path === "/dashboard" || path === ""}
+              />
             </li>
             <li>
-              <SidebarButton label="Sản phẩm" Icon={FaCube} path="products" selected={path === "products"}/>
+              <SidebarButton
+                label="Sản phẩm"
+                Icon={FaCube}
+                path="products"
+                selected={path === "products"}
+              />
             </li>
             <li>
-              <SidebarButton label="Đơn hàng" Icon={FaCartShopping} path="orders" selected={path === "orders"}/>
+              <SidebarButton
+                label="Đơn hàng"
+                Icon={FaCartShopping}
+                path="orders"
+                selected={path === "orders"}
+              />
             </li>
             <li>
-              <SidebarButton label="Khách hàng" Icon={FaUsers} path="users" selected={path === "users"}/>
+              <SidebarButton
+                label="Khách hàng"
+                Icon={FaUsers}
+                path="customers"
+                selected={path === "customers"}
+              />
             </li>
             <li>
-              <SidebarButton label="Phân tích AI" Icon={FaChartColumn} path="ai-analysis" selected={path === "ai-analysis"}/>
+              <SidebarButton
+                label="Phân tích AI"
+                Icon={FaChartColumn}
+                path="ai-analysis"
+                selected={path === "ai-analysis"}
+              />
             </li>
           </ul>
           <div className="absolute bottom-4">
@@ -51,8 +76,11 @@ export const Sidebar = () => {
 
 const SidebarButton = ({ Icon, label, path, selected }) => {
   return (
-    <Link to={`${path}`}
-      className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 group ${selected ? "bg-green-700 text-white" : ""}`}
+    <Link
+      to={`${path}`}
+      className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 group ${
+        selected ? "bg-green-700 text-white" : ""
+      }`}
     >
       {Icon && <Icon className="size-5" />}
       <span className="ms-3 hidden lg:block">{label}</span>
