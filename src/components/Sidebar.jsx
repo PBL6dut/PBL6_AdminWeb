@@ -6,10 +6,14 @@ import {
   FaTableColumns,
   FaArrowRightFromBracket,
 } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useContextName } from "../hooks/useContextName";
+import { useContext } from "react";
+import AuthContext from "../contexts/AuthContext";
 export const Sidebar = () => {
-  const path = useLocation().pathname.replace("/dashboard/", "");
-  console.log(path);
+  const path = useContextName()
+  const { logout } = useContext(AuthContext)
+
   return (
     <>
       <aside
@@ -66,7 +70,10 @@ export const Sidebar = () => {
             </li>
           </ul>
           <div className="absolute bottom-4">
-            <SidebarButton label="Đăng xuất" Icon={FaArrowRightFromBracket} />
+            <button onClick={logout} className="cursor-pointer flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 group">
+              <FaArrowRightFromBracket className="size-5" />
+              <span className="ms-3 hidden lg:block">Đăng xuất</span>
+            </button>
           </div>
         </div>
       </aside>

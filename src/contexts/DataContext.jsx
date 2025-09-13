@@ -1,11 +1,14 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useFetch } from "../hooks/useFetch";
+import AuthContext from "./AuthContext";
+import { Navigate } from "react-router-dom";
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  const { isLoading, error, customers, orders, products } = useFetch();
-  const [data, setData] = useState({ customers: [], orders: [], products: [] });
+  const { isLoading, error, customers, orders, products, categories } = useFetch();
+  const [data, setData] = useState({ customers: [], orders: [], products: [], categories: [] });
+  const { isAuthenticated } = useContext(AuthContext);
 
   const [choosenObject, setChoosenObject] = useState(null);
 
@@ -28,8 +31,12 @@ export const DataProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setData({ customers, orders, products });
-  }, [customers, orders, products]);
+    setData({ customers, orders, products, categories });
+  }, [customers, orders, products, categories]);
+
+  if (!isAuthenticated) {
+    return null // Redirect to login if not authenticated
+  }
 
   return (
     <DataContext.Provider

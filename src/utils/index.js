@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const calculateTotalAmount = (items) => {
   return items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -32,4 +33,35 @@ const formatPrice = (price, locale = "vi-VN", currency = "VND") => {
   }).format(price);
 };
 
-export { calculateTotalAmount, calculateSum, calculateTotalSpent, formatDate, formatPrice, findNameById };
+const formatImageUrl = (url) => {
+  return `${BACKEND_URL}/${url}`;
+}
+
+const formatOrderData = (data) => {
+  switch(data){
+    case "cash_on_delivery":
+      return "Thanh toán khi nhận hàng";
+    case "bank_transfer":
+      return "Chuyển khoản ngân hàng";
+    case "credit_card":
+      return "Thẻ tín dụng";
+    case "e_wallet":
+      return "Ví điện tử";
+    case "installment":
+      return "Trả góp";
+    default:
+      return "Khác";
+    case "standard_delivery":
+      return "Giao hàng tiêu chuẩn";
+    case "express_delivery":
+      return "Giao hàng nhanh";
+    case "same_day_delivery":
+      return "Giao hàng trong ngày";
+    case "pickup_at_store":
+      return "Nhận hàng tại cửa hàng";
+    case "installation_service":
+      return "Dịch vụ lắp đặt";
+  }
+}
+
+export { calculateTotalAmount, calculateSum, calculateTotalSpent, formatDate, formatPrice, findNameById, formatOrderData, formatImageUrl };

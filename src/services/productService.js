@@ -19,3 +19,13 @@ export const getProductById = async (id) => {
         throw error;
     }
 }
+
+export const getAllCategories = async () => {
+    try {
+        const response = await axios.get("/category/list");
+        return response;
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+    }
+}
