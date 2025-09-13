@@ -16,7 +16,13 @@ import DataContext from "./DataContext";
 import ModalContext from "./ModalContext";
 import avatarDefault from "../assets/avatar-default.jpg";
 import furnitureDefault from "../assets/furniture-default.png";
-import { calculateSum, findNameById, formatDate, formatPrice } from "../utils";
+import {
+  calculateSum,
+  findNameById,
+  formatDate,
+  formatImageUrl,
+  formatPrice,
+} from "../utils";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { useContextName } from "../hooks/useContextName";
 
@@ -54,7 +60,8 @@ export const ResourcePageProvider = ({ children }) => {
       },
       {
         title: "Đang bán",
-        content: data.products.filter((p) => p.status === "active").length || "0",
+        content:
+          data.products.filter((p) => p.status === "active").length || "0",
         Icon: { icon: FaCircle, color: "text-green-600", size: "w-2 h-2" },
       },
       {
@@ -147,9 +154,14 @@ export const ResourcePageProvider = ({ children }) => {
         <div className="flex">
           <img
             className="size-12 mr-2 rounded-lg"
-            src={item.image_url || furnitureDefault}
+            src={
+              (item.images && formatImageUrl(item.images[0])) ||
+              furnitureDefault
+            }
             alt={"ảnh"}
-            onError={e => { e.target.src = furnitureDefault; }}
+            onError={(e) => {
+              e.target.src = furnitureDefault;
+            }}
           />
           <div>
             <p>{item.name || "N/A"}</p>
@@ -193,7 +205,7 @@ export const ResourcePageProvider = ({ children }) => {
               ` + ${item.order_details.length - 1} sản phẩm khác`}
           </p>
         </>,
-        <>{formatPrice(item.total_amount) || "N/A"}</>,
+        <>{formatPrice(Number(item.total_amount)) || "N/A"}</>,
         <>{<StatusBadge>{item.status}</StatusBadge> || "N/A"}</>,
       ],
     },
@@ -213,7 +225,9 @@ export const ResourcePageProvider = ({ children }) => {
             className="size-12 mr-2 rounded-3xl"
             src={item.avatar || avatarDefault}
             alt="avatar"
-            onError={e => { e.target.src = avatarDefault; }}
+            onError={(e) => {
+              e.target.src = avatarDefault;
+            }}
           />
           <div>
             <p>{item.full_name || "N/A"}</p>
@@ -238,18 +252,68 @@ export const ResourcePageProvider = ({ children }) => {
     },
   };
 
-  const formConfig = {
+  const formConfigByType = {
     products: {
-      objectType: "products",
-      keys:
-        data && data.products && data.products.length > 0
-          ? Object.keys(data.products[0]).filter(
-              (key) => key !== "status" && key !== "created_at"
-            )
-          : [],
-      labels: ["Tên sản phẩm", "Hình ảnh", "Danh mục", "Giá", "Số lượng hàng"],
-      onSubmit: () => {
-        alert("Submitted");
+      objectType: "sản phẩm",
+      name: {
+        name: "name",
+        label: "Tên sản phẩm",
+        type: "text",
+        placeholder: "Nhập tên sản phẩm",
+      },
+      description: {
+        name: "description",
+        label: "Mô tả",
+        type: "textarea",
+        placeholder: "Nhập mô tả sản phẩm",
+      },
+      price: {
+        name: "price",
+        label: "Giá",
+        type: "number",
+        placeholder: "Nhập giá sản phẩm",
+      },
+      category: {
+        name: "category",
+        label: "Danh mục",
+        type: "select",
+        options:
+          data && data.categories
+            ? data.categories.map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))
+            : [],
+      },
+      image_url: {
+        name: "image_url",
+        label: "URL ảnh",
+        type: "text",
+        placeholder: "Nhập URL ảnh sản phẩm",
+      },
+      stock_quantity: {
+        name: "stock_quantity",
+        label: "Số lượng hàng tồn kho",
+        type: "number",
+        placeholder: "Nhập số lượng hàng tồn kho",
+      },
+      material: {
+        name: "material",
+        label: "Chất liệu",
+        type: "text",
+        placeholder: "Nhập chất liệu sản phẩm",
+      },
+      dimensions: {
+        name: "dimensions",
+        label: "Kích thước",
+        type: "text",
+        placeholder: "Nhập kích thước sản phẩm",
+      },
+      color: {
+        name: "color",
+        label: "Màu sắc",
+        type: "text",
+        placeholder: "Nhập màu sắc sản phẩm",
       },
     },
 
@@ -302,17 +366,11 @@ export const ResourcePageProvider = ({ children }) => {
 
   const onViewByType = {
     products: ({ object }) => {
+      console.log(object)
       openModal(
         "detail",
         {
           data: object,
-          labels: [
-            "Tên",
-            "Danh mục",
-            "Giá",
-            "Số lượng hàng tồn kho",
-            "Trạng thái",
-          ],
         },
         "product"
       );
@@ -323,13 +381,6 @@ export const ResourcePageProvider = ({ children }) => {
         "detail",
         {
           data: object,
-          labels: [
-            "Mã đơn hàng",
-            "Khách hàng",
-            "Sản phẩm",
-            "Tổng tiền",
-            "Trạng thái",
-          ],
         },
         "order"
       );
@@ -340,13 +391,6 @@ export const ResourcePageProvider = ({ children }) => {
         "detail",
         {
           data: object,
-          labels: [
-            "Tên khách hàng",
-            "Liên hệ",
-            "Tổng đơn hàng",
-            "Tổng chi tiêu",
-            "Đơn gần nhất",
-          ],
         },
         "customer"
       );
@@ -359,7 +403,7 @@ export const ResourcePageProvider = ({ children }) => {
       cards: cardsByType.products,
       table: tableByType.products,
       searchInputPlaceholder: "Tìm kiếm sản phẩm, SKU",
-      formConfig: formConfig.products,
+      formConfig: formConfigByType.products,
       onDelete: onDeleteByType.products,
       onView: onViewByType.products,
     },
@@ -369,7 +413,7 @@ export const ResourcePageProvider = ({ children }) => {
       cards: cardsByType.orders,
       table: tableByType.orders,
       searchInputPlaceholder: "Tìm mã đơn, tên khách hàng, SĐT...",
-      formConfig: formConfig.orders,
+      formConfig: formConfigByType.orders,
       onView: onViewByType.orders,
     },
 
@@ -378,7 +422,7 @@ export const ResourcePageProvider = ({ children }) => {
       cards: cardsByType.customers,
       table: tableByType.customers,
       searchInputPlaceholder: "Tìm mã đơn, tên khách hàng, SĐT...",
-      formConfig: formConfig.customers,
+      formConfig: formConfigByType.customers,
       onView: onViewByType.customers,
     },
   };

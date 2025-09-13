@@ -16,23 +16,27 @@ import {
   FaPalette,
   FaRuler,
   FaCoins,
+  FaTruck,
+  FaCreditCard,
 } from "react-icons/fa6";
 import ModalContext from "../../contexts/ModalContext";
 import ResourcePageContext from "../../contexts/ResourcePageContext";
 import { createValidationRules } from "../../hooks/useFormValidation";
 import { useForm } from "../../hooks/useForm";
-import { Form } from "./Form";
 import avatarDefault from "../../assets/avatar-default.jpg";
 import furnitureDefault from "../../assets/furniture-default.png";
 import {
   calculateTotalSpent,
   findNameById,
   formatDate,
+  formatImageUrl,
+  formatOrderData,
   formatPrice,
 } from "../../utils";
 import { InformationCard, StatisticsCard } from "./Card";
 import DataContext from "../../contexts/DataContext";
 import { StatusBadge } from "./StatusBadge";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Modal = ({ isOpen, onClose, children, title, size = "md" }) => {
   if (!isOpen) return null;
@@ -190,23 +194,22 @@ export const FormModal = ({
   onClose,
   title = "Chỉnh sửa thông tin",
   children,
+  onSubmit,
   size,
   initialData,
 }) => {
-  const { formConfig } = useContext(ResourcePageContext);
-  const { objectType, keys, onSubmit } = formConfig[objectType] || {};
+  const { context } = useContext(ResourcePageContext);
+  const { formConfig } = context;
+  const { objectType } = formConfig;
 
   const validationRules = createValidationRules(objectType);
+  const keys = Object.keys(formConfig).filter((key) => key !== "objectType");
+  const data = keys.reduce((obj, key) => {
+    obj[key] = initialData ? initialData[key] : "";
+    return obj;
+  }, {});
 
-  let initialValues = {};
-  if (initialData) {
-    initialValues = initialData;
-  } else {
-    keys.forEach((key) => {
-      initialValues[key] = "";
-    });
-  }
-  const form = useForm(initialValues, validationRules);
+  const form = useForm(data, validationRules);
 
   const handleSubmit = onSubmit
     ? (event) => {
@@ -217,11 +220,8 @@ export const FormModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size={size}>
-      <Form form={form} onSubmit={handleSubmit}>
-        {keys &&
-          keys.map((key, index) => (
-            <FormField key={index} name={key} label={labels[index]} required />
-          ))}
+      <Form form={form} onSubmit={handleSubmit} context={formConfig}>
+        {children}
       </Form>
     </Modal>
   );
@@ -409,13 +409,13 @@ const ProductDetailModal = ({
   console.log(data);
 
   const Information = () => {
-    const { image_url, name, price, description, status } = data;
+    const { images, name, price, description, status } = data;
 
     return (
       <div className="flex justify-between mb-6">
         <div className="flex gap-4 max-w-xl">
           <img
-            src={image_url || furnitureDefault}
+            src={(images && formatImageUrl(images[0])) || furnitureDefault}
             alt="image"
             className="w-36 h-36 rounded-lg object-cover"
             onError={(e) => {
@@ -433,7 +433,7 @@ const ProductDetailModal = ({
           <h2 className="text-2xl font-bold text-gray-900">
             {formatPrice(price)}
           </h2>
-          <StatusBadge >{status}</StatusBadge>
+          <StatusBadge>{status}</StatusBadge>
         </div>
       </div>
     );
@@ -473,6 +473,31 @@ const ProductDetailModal = ({
     return <InformationCard title="Thông tin chi tiết" content={content} />;
   };
 
+  const Images = () => {
+    const { images } = data;
+    if (!images || images.length === 0) return null;
+
+    return (
+      <div
+        className="overflow-x-auto rounded-lg bg-gray-100 border border-gray-300 p-4"
+        onError={(e) => {
+          e.target.style.display = "none";
+        }}
+      >
+        <h3 className="font-semibold text-lg text-left mb-4">Thư viện ảnh</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {images.map((imgUrl, index) => (
+            <img
+              src={formatImageUrl(imgUrl)}
+              key={index}
+              className="h-auto max-w-full rounded-lg"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const Statistics = () => {
     const { order_details } = data || [];
 
@@ -510,7 +535,9 @@ const ProductDetailModal = ({
       return <p>Sản phẩm chưa có đơn hàng nào.</p>;
     }
 
-    const filteredOrders = orders.filter((order) => order_details.some((detail) => detail.order_id === order.id));
+    const filteredOrders = orders.filter((order) =>
+      order_details.some((detail) => detail.order_id === order.id)
+    );
 
     if (filteredOrders.length === 0) {
       return <p>Sản phẩm chưa có đơn hàng nào.</p>;
@@ -565,6 +592,7 @@ const ProductDetailModal = ({
         <DetailCard />
         <Statistics />
       </div>
+      <Images />
       <OrderTable />
     </Modal>
   );
@@ -594,7 +622,7 @@ const OrderDetailModal = ({
           <h2 className="text-2xl font-bold text-gray-900 mt-4">
             {formatPrice(data.total_amount)}
           </h2>
-          <StatusBadge >{data.status}</StatusBadge>
+          <StatusBadge>{data.status}</StatusBadge>
         </div>
       </div>
     );
@@ -630,6 +658,18 @@ const OrderDetailModal = ({
     if (!data) return null;
 
     const content = {
+      payment_method: {
+        Icon: <FaCreditCard className="text-purple-700" />,
+        value: formatOrderData(data.payment_method),
+      },
+      shipping_method: {
+        Icon: <FaTruck className="text-blue-700" />,
+        value: formatOrderData(data.shipping_method),
+      },
+      expected_delivery_date: {
+        Icon: <FaCalendar className="text-green-700" />,
+        value: formatDate(data.expected_delivery_date),
+      },
       notes: {
         Icon: <FaNoteSticky className="text-yellow-400" />,
         value: data.notes,
@@ -647,8 +687,9 @@ const OrderDetailModal = ({
     const details = order_details.map((detail) => {
       const product_name = findNameById("product", detail.product_id, products);
       const product_image =
-        products.find((p) => p.id === detail.product_id).image_url ||
-        furnitureDefault;
+        formatImageUrl(
+          products.find((p) => p.id === detail.product_id).images[0]
+        ) || furnitureDefault;
       return { ...detail, product_name, product_image };
     });
 
@@ -693,6 +734,12 @@ const OrderDetailModal = ({
               </div>
             );
           })}
+          <div className="p-2 flex justify-between border-b border-gray-300">
+            <p className="text-right text-md">Phí vận chuyển: </p>
+            <p className="text-right text-md text-black">
+              {formatPrice(data.shipping_fee)}
+            </p>
+          </div>
           <div className="p-2 flex justify-between">
             <p className="text-right text-lg">Tổng cộng: </p>
             <p className="text-right text-lg text-black">

@@ -7,29 +7,32 @@ import { Modals } from "./components/ui/Modal";
 import { ResourcePageProvider } from "./contexts/ResourcePageContext";
 import { Resource } from "./pages/Resource";
 import { AIAnalysis } from "./pages/AIAnalysis";
+import { Login } from "./components/ui/Login";
+import { AuthLayout } from "./layouts/AuthLayout";
+import { Register } from "./components/ui/Register";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProductForm } from "./components/ui/Form";
 
 function App() {
   return (
-    <DataProvider>
-      <ModalProvider>
-        <BrowserRouter>
-          <ResourcePageProvider>
-            <div className="min-h-screen bg-gray-100">
-              <Routes>
-                <Route path="/dashboard" element={<MainLayout />}>
-                  <Route index element={<Dashboard />} />
-                  <Route path="products" element={<Resource />} />
-                  <Route path="orders" element={<Resource />} />
-                  <Route path="customers" element={<Resource />} />
-                  <Route path="ai-analysis" element={<AIAnalysis />} />
-                </Route>
-              </Routes>
-            </div>
-            <Modals />
-          </ResourcePageProvider>
-        </BrowserRouter>
-      </ModalProvider>
-    </DataProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<ProductForm />} />
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
+          <Route path="/dashboard" element={<MainLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="products" element={<Resource />} />
+            <Route path="orders" element={<Resource />} />
+            <Route path="customers" element={<Resource />} />
+            <Route path="ai-analysis" element={<AIAnalysis />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

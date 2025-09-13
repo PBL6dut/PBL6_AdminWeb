@@ -2,6 +2,7 @@ import { useEffect, useReducer } from "react";
 import { getAllCustomers } from "../services/userService";
 import { getAllOrders } from "../services/orderService";
 import { getAllProducts } from "../services/productService";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const initialState = {
   isLoading: false,
@@ -9,6 +10,7 @@ const initialState = {
   customers: [],
   orders: [],
   products: [],
+  categories: [],
 };
 
 const reducer = (state, action) => {
@@ -33,21 +35,24 @@ export const useFetch = () => {
       const customersRes = await getAllCustomers();
       const ordersRes = await getAllOrders();
       const productsRes = await getAllProducts();
+      const categoriesRes = await getAllProducts();
       if (
         customersRes &&
         customersRes.status === 200 &&
         ordersRes &&
         ordersRes.status === 200 &&
         productsRes &&
-        productsRes.status === 200
+        productsRes.status === 200 &&
+        categoriesRes &&
+        categoriesRes.status === 200
       ) {
         const customers = await customersRes.data;
         const orders = await ordersRes.data;
         const products = await productsRes.data;
-        console.log(customersRes)
+        const categories = await categoriesRes.data;
         dispatch({
           type: "FETCH_SUCCESS",
-          payload: { customers, orders, products },
+          payload: { customers, orders, products, categories },
         });
       }
     } catch (error) {
@@ -58,7 +63,7 @@ export const useFetch = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(state.customers || state.error);
+  console.log(state.products || state.error);
 
   return {
     isLoading: state.isLoading,
@@ -66,5 +71,6 @@ export const useFetch = () => {
     customers: state.customers,
     orders: state.orders,
     products: state.products,
+    categories: state.categories,
   };
 };

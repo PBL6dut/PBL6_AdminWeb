@@ -1,130 +1,92 @@
-import React from 'react';
-import { useFormContext } from '../../contexts/FormContext';
-import { FormProvider } from '../../contexts/FormContext';
+import { useForm } from "react-hook-form";
 
-export const Form = ({ form, onSubmit, children, className = '', }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    form.handleSubmit(onSubmit);
-  };
-
+const Form = ({ title, children }) => {
   return (
-    <FormProvider form={form}>
-      <form onSubmit={handleSubmit} className={className}>
-        {children}
-      </form>
-    </FormProvider>
+    <div class="mt-4 flex flex-col bg-gray-100 rounded-lg p-4 shadow-sm">
+      {children}
+    </div>
   );
 };
 
-const FormField = ({ 
-  name, 
-  label, 
-  type = 'text', 
-  required = false, 
-  placeholder,
-  options = [], // for select
-  className = '',
-  ...props 
-}) => {
-  const { values, errors, touched, handleChange, handleBlur } = useFormContext();
-  
-  const hasError = touched[name] && errors[name];
-  
-  const baseInputClass = `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-    hasError ? 'border-red-500' : 'border-gray-300'
-  } ${className}`;
+const Title = ({ text }) => {
+  return <h2 class="text-2xl font-semibold mb-4 text-black">{text}</h2>;
+}
 
-  const renderInput = () => {
-    switch (type) {
-      case 'select':
-        return (
+const Input = ({ label }) => {
+  return (
+    <div class="mt-4">
+      <label class="text-black" for="">
+        {label}
+      </label>
+      <input
+        placeholder="Your name"
+        class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
+        type="text"
+      />
+    </div>
+  );
+};
+
+const Textarea = ({ label }) => {
+  return (
+    <div class="mt-4">
+        <label class="text-black" for="">
+          {label}
+        </label>
+        <textarea
+          placeholder="Your address"
+          class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
+          id="address"
+        ></textarea>
+      </div>
+  )
+}
+
+const Select = ({ label, options}) => {
+  return(
+    <div class="mt-4">
+      <label class="text-black" for="">
+            {label}
+          </label>
           <select
-            name={name}
-            value={values[name] || ''}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            className={baseInputClass}
-            {...props}
+            class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
+            id="country"
           >
-            <option value="">-- Chọn {label.toLowerCase()} --</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
-        );
-      
-      case 'textarea':
-        return (
-          <textarea
-            name={name}
-            value={values[name] || ''}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            className={`${baseInputClass} resize-none`}
-            rows={4}
-            {...props}
-          />
-        );
-      
-      case 'checkbox':
-        return (
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name={name}
-              checked={values[name] || false}
-              onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              {...props}
-            />
-            <label htmlFor={name} className="ml-2 block text-sm text-gray-900">
-              {label}
-              {required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-          </div>
-        );
-      
-      default:
-        return (
-          <input
-            type={type}
-            name={name}
-            value={values[name] || ''}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            className={baseInputClass}
-            {...props}
-          />
-        );
-    }
-  };
+    </div>
+  )
+}
 
-  if (type === 'checkbox') {
-    return (
-      <div className="mb-4">
-        {renderInput()}
-        {hasError && (
-          <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-        )}
-      </div>
-    );
+export const ProductForm = ({ object }) => {
+  const { register, handleSubmit, formState: { errors } } = useForm()
+  const onSubmit = data => console.log(data);
+
+  const formSchema = {
+    name: { required: "Chưa điền tên sản phẩm", defaultValue: object ? object.name : "" },
+    description: { defaultValue: object ? object.description : "" },
+    price: { required: "Chưa điền giá sản phẩm", defaultValue: object ? object.price : "" },
+    
   }
 
-  return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      {renderInput()}
-      {hasError && (
-        <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-      )}
-    </div>
-  );
-};
+  return(
+    <Form>
+      <Title text="Thêm sản phẩm mới" />
+      <Input label="Tên sản phẩm" />
+      <Input label="Giá sản phẩm" />
+      <Textarea label="Mô tả sản phẩm" />
+      <Select 
+        label="Danh mục"
+        options={[
+          { value: 'electronics', label: 'Điện tử' },
+          { value: 'clothing', label: 'Thời trang' },
+          { value: 'home', label: 'Nhà cửa' },
+        ]}
+      />
+    </Form>
+  )
+}
