@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { DataProvider } from "../contexts/DataContext";
 import { ResourcePageProvider } from "../contexts/ResourcePageContext";
 import { ModalProvider } from "../contexts/ModalContext";
-import { Modals } from "../components/ui/Modal";
+import { Modals } from "../components/ui/modal/Modal";
 import AuthContext from "../contexts/AuthContext";
 import { useContext } from "react";
 

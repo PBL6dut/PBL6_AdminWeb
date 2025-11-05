@@ -2,7 +2,7 @@ import axios from "./axios";
 
 export const getAllCustomers = async () => {
     try {
-        const response = await axios.get("/user/customer/list");
+        const response = await axios.get("/users/customers");
         console.log(response)
         return response;
     } catch (error) {
@@ -13,7 +13,7 @@ export const getAllCustomers = async () => {
 
 export const getCustomerById = async (id) => {
     try {
-        const response = await axios.get(`/user/customer/${id}`);
+        const response = await axios.get(`/users/customers/${id}`);
         return response;
     } catch (error) {
         console.error("Error fetching customer:", error);

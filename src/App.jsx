@@ -3,7 +3,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { ModalProvider } from "./contexts/ModalContext";
 import { DataProvider } from "./contexts/DataContext";
-import { Modals } from "./components/ui/Modal";
+import { Modals } from "./components/ui/modal/Modal";
 import { ResourcePageProvider } from "./contexts/ResourcePageContext";
 import { Resource } from "./pages/Resource";
 import { AIAnalysis } from "./pages/AIAnalysis";
@@ -11,14 +11,15 @@ import { Login } from "./components/ui/Login";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { Register } from "./components/ui/Register";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ProductForm } from "./components/ui/Form";
+// import { ProductForm } from "./components/ui/Form";
+import { FormModal } from "./components/ui/modal/form/FormModal";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ProductForm />} />
+          <Route path="/" element={<FormModal />} />
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
