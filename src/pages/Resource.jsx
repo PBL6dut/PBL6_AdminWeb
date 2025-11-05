@@ -17,7 +17,7 @@ export const Resource = () => {
     return <LoadingSpinner />;
   }
 
-  const { heading, cards, table, onDelete, onView } = context;
+  const { heading, cards, table, onDelete, onView, onEdit } = context;
 
   return (
     <>
@@ -61,7 +61,10 @@ export const Resource = () => {
                   iconType="view"
                   handleClick={() => onView({ object: item })}
                 />
-                <IconButton iconType="edit" />
+                <IconButton
+                  iconType="edit"
+                  handleClick={() => onEdit({ object: item })}
+                />
                 {path === "products" && (
                   <IconButton
                     iconType="delete"

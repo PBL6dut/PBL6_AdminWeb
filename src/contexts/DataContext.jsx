@@ -12,7 +12,7 @@ export const DataProvider = ({ children }) => {
 
   const [choosenObject, setChoosenObject] = useState(null);
 
-  const deleteObject = (field, object) => {
+  const deleteObject = async (field, object) => {
     setData((prevData) => {
       const newData = { ...prevData };
       newData[field] = newData[field].filter((item) => item !== object);

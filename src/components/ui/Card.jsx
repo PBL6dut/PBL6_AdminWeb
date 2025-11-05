@@ -43,7 +43,7 @@ export const InformationCard = ({ title, content }) => {
           data.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               {item.Icon || null}
-              <p className="text-black dark:text-gray-400">
+              <p className="flex gap-1 text-black dark:text-gray-400">
                 {item.label && <span className="font-semibold">{item.label}: </span>}
                 {item.value}
               </p>

@@ -23,4 +23,21 @@ instance.interceptors.request.use(
   }
 );
 
+instance.interceptors.response.use(
+  (response) => {
+    if(response.data && response.data.success){
+      return response.data;
+    }
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Handle unauthorized access, e.g., redirect to login
+      console.error("Unauthorized access - perhaps redirect to login?");
+    }
+    return Promise.reject(error);
+  }
+);
+
+
 export default instance;
