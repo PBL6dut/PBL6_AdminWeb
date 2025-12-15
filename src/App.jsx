@@ -12,12 +12,16 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { Register } from "./components/ui/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RootRedirect } from "./components/RootRedirect";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ToastProvider } from "./components/ui/Toast";
 // import { ProductForm } from "./components/ui/Form";
 // import { FormModal } from "./components/ui/modal/form/FormModal";
 
 function App() {
   return (
-    <AuthProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<RootRedirect />} />
@@ -34,7 +38,9 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+        </AuthProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 

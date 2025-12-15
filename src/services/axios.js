@@ -32,8 +32,11 @@ instance.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized access, e.g., redirect to login
-      console.error("Unauthorized access - perhaps redirect to login?");
+      // Token không hợp lệ hoặc hết hạn, xóa token và redirect về login
+      console.error("Unauthorized: Token invalid or expired");
+      localStorage.removeItem('token');
+      // Redirect về trang login
+      window.location.href = '/auth/login';
     }
     return Promise.reject(error);
   }

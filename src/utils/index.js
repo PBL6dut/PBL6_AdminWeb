@@ -34,7 +34,32 @@ const formatPrice = (price, locale = "vi-VN", currency = "VND") => {
 };
 
 const formatImageUrl = (url) => {
-  return `${BACKEND_URL}/${url}`;
+  if (!url) {
+    return "";
+  }
+
+  // Nếu url là object, lấy property .url
+  if (typeof url === 'object' && url.url) {
+    url = url.url;
+  }
+
+  // Convert về string nếu chưa phải string
+  const urlString = String(url);
+
+  // Nếu URL đã là absolute URL (http:// hoặc https://), return luôn
+  if (urlString.startsWith('http://') || urlString.startsWith('https://')) {
+    return urlString;
+  }
+
+  // Loại bỏ dấu "/" đầu của url nếu có
+  const cleanUrl = urlString.startsWith('/') ? urlString.substring(1) : urlString;
+
+  // Đảm bảo BACKEND_URL không có dấu "/" cuối
+  const cleanBackendUrl = BACKEND_URL?.endsWith('/')
+    ? BACKEND_URL.substring(0, BACKEND_URL.length - 1)
+    : BACKEND_URL;
+
+  return `${cleanBackendUrl}/${cleanUrl}`;
 }
 
 const formatOrderData = (data) => {

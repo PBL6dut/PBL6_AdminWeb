@@ -3,6 +3,7 @@ import DataContext from "./DataContext";
 import ModalContext from "./ModalContext";
 import { useContextName } from "../hooks/useContextName";
 import { deleteProduct } from "../services/productService";
+import { useToast } from "../components/ui/Toast";
 import headingByType from "../configs/headingConfigs";
 import cardsByType from "../configs/cardConfigs";
 import tableByType from "../configs/tableConfigs";
@@ -20,11 +21,13 @@ export const ResourcePageProvider = ({ children }) => {
 
   const { modals, openModal, closeModal } = useContext(ModalContext);
 
+  const toast = useToast();
+
   const { form, detail, confirm } = modals;
 
   const contextByType = {
     products: {
-      heading: headingByType(openModal, closeModal).products,
+      heading: headingByType(openModal, closeModal, toast).products,
       cards: cardsByType(data).products,
       table: tableByType(data).products,
       searchInputPlaceholder: "Tìm kiếm sản phẩm, SKU",
@@ -60,12 +63,10 @@ export const ResourcePageProvider = ({ children }) => {
     data && setContext(contextByType[path]);
   }, [data, path]);
 
-  if (!data || isLoading) {
-    return null;
-  }
-
+  // Không block render khi loading, chỉ cần context là null
+  // Component sử dụng context sẽ tự xử lý khi context chưa có
   return (
-    <ResourcePageContext.Provider value={{ context }}>
+    <ResourcePageContext.Provider value={{ context, isLoading }}>
       {children}
     </ResourcePageContext.Provider>
   );

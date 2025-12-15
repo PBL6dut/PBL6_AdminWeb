@@ -34,6 +34,7 @@ export const useFetch = () => {
   const fetchData = async () => {
     dispatch({ type: "FETCH_START" });
     try {
+      console.log("🔄 Fetching data from API...");
       const [customersRes, ordersRes, productsRes, categoriesRes] = await Promise.all([
         getAllCustomers(),
         getAllOrders(),
@@ -41,18 +42,40 @@ export const useFetch = () => {
         getAllCategories(),
       ]);
 
+      console.log("📦 API Responses:", {
+        customers: customersRes?.data?.length || 0,
+        orders: ordersRes?.data?.length || 0,
+        products: productsRes?.data?.length || 0,
+        categories: categoriesRes?.data?.length || 0,
+      });
+
+      console.log("📦 Products Response:", productsRes);
+
       if (customersRes && ordersRes && productsRes && categoriesRes) {
+        // Backend trả về data nested trong data.data
+        const customers = customersRes.data?.data || customersRes.data || [];
+        const orders = ordersRes.data?.data || ordersRes.data || [];
+        const products = productsRes.data?.data || productsRes.data || [];
+        const categories = categoriesRes.data?.data || categoriesRes.data || [];
+
         dispatch({
           type: "FETCH_SUCCESS",
           payload: {
-            customers: customersRes.data,
-            orders: ordersRes.data,
-            products: productsRes.data,
-            categories: categoriesRes.data,
+            customers,
+            orders,
+            products,
+            categories,
           },
+        });
+        console.log("✅ Data fetched successfully!", {
+          customersCount: customers.length,
+          ordersCount: orders.length,
+          productsCount: products.length,
+          categoriesCount: categories.length
         });
       }
     } catch (error) {
+      console.error("❌ Fetch error:", error);
       dispatch({ type: "FETCH_ERROR", payload: error.message });
     }
   };

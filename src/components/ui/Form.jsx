@@ -19,24 +19,34 @@ export const Form = ({ formSchema, onSubmit, initialData = {} }) => {
       encType="multipart/form-data"
     >
       <div className="mt-4 grid grid-cols-2 gap-4 bg-gray-200 rounded-lg p-4 shadow-sm">
-        {keys.map((key) => (
-          <div key={key}>
-            <FormField
-              label={formSchema[key].label}
-              type={formSchema[key].type}
-              placeholder={formSchema[key].placeholder}
-              register={register}
-              name={formSchema[key].name}
-              validation={formSchema[key].validation}
-              options={formSchema[key].options}
-              multiple={formSchema[key].multiple || false} // Truyền prop multiple từ schema
-              // data={initialData[key] || ""}
-            />
-            {errors[formSchema[key].name] && (
-              <p className="text-red-500 text-sm mt-1">{errors[formSchema[key].name].message}</p>
-            )}
-          </div>
-        ))}
+        {keys.map((key) => {
+          // Lấy data từ initialData, xử lý trường hợp đặc biệt cho images
+          let fieldData = initialData[key] || "";
+
+          // Nếu field là images, lấy từ initialData.images
+          if (key === "images" && initialData.images) {
+            fieldData = initialData.images;
+          }
+
+          return (
+            <div key={key}>
+              <FormField
+                label={formSchema[key].label}
+                type={formSchema[key].type}
+                placeholder={formSchema[key].placeholder}
+                register={register}
+                name={formSchema[key].name}
+                validation={formSchema[key].validation}
+                options={formSchema[key].options}
+                multiple={formSchema[key].multiple || false}
+                data={fieldData}
+              />
+              {errors[formSchema[key].name] && (
+                <p className="text-red-500 text-sm mt-1">{errors[formSchema[key].name].message}</p>
+              )}
+            </div>
+          );
+        })}
       </div>
       <div class="mt-6 flex justify-center">
         <input
@@ -119,26 +129,47 @@ const FileInput = ({
   multiple = false, // Thêm prop multiple
   data = [],
 }) => {
-  const [previews, setPreviews] = useState(
-    data.map((item) => formatImageUrl(item)) || []
-  ); // Thay đổi thành mảng để lưu nhiều ảnh preview
+  // Khởi tạo previews từ data có sẵn (ảnh cũ từ initialData)
+  const initialPreviews = Array.isArray(data) && data.length > 0
+    ? data.map((item) => {
+        // Nếu item là object với url property
+        if (typeof item === 'object' && item.url) {
+          return formatImageUrl(item.url);
+        }
+        // Nếu item là string url
+        return formatImageUrl(item);
+      })
+    : [];
+
+  const [previews, setPreviews] = useState(initialPreviews);
+  const [hasNewImages, setHasNewImages] = useState(false);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files); // Chuyển FileList thành Array
     if (files.length > 0) {
       const newPreviews = files.map((file) => URL.createObjectURL(file));
       setPreviews(newPreviews);
+      setHasNewImages(true);
     } else {
-      setPreviews([]);
+      // Nếu không chọn file mới, giữ ảnh cũ
+      setPreviews(initialPreviews);
+      setHasNewImages(false);
     }
   };
 
-  // Dọn dẹp các Object URL để tránh rò rỉ bộ nhớ
+  // Dọn dẹp các Object URL để tránh rò rỉ bộ nhớ (chỉ revoke URL mới tạo)
   useEffect(() => {
     return () => {
-      previews.forEach((url) => URL.revokeObjectURL(url));
+      if (hasNewImages) {
+        previews.forEach((url) => {
+          // Chỉ revoke blob URLs (URL.createObjectURL)
+          if (url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+          }
+        });
+      }
     };
-  }, [previews]);
+  }, [previews, hasNewImages]);
 
   return (
     <div className="">
@@ -151,20 +182,32 @@ const FileInput = ({
         {...register(name, {
           ...validation,
           onChange: handleFileChange,
+          required: false, // Không bắt buộc khi edit vì đã có ảnh cũ
         })}
       />
-      {previews.length > 0 && ( // Kiểm tra previews.length
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {" "}
-          {/* Hiển thị nhiều ảnh preview */}
-          {previews.map((src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`Preview ${index}`}
-              className="h-24 w-24 object-cover rounded-md"
-            />
-          ))}
+      {previews.length > 0 && (
+        <div className="mt-2">
+          {!hasNewImages && initialPreviews.length > 0 && (
+            <p className="text-sm text-gray-600 mb-2">
+              Ảnh hiện tại ({previews.length} ảnh):
+            </p>
+          )}
+          {hasNewImages && (
+            <p className="text-sm text-green-600 mb-2">
+              Ảnh mới được chọn ({previews.length} ảnh):
+            </p>
+          )}
+          <div className="grid grid-cols-3 gap-2">
+            {previews.map((src, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={src}
+                  alt={`Preview ${index}`}
+                  className="h-24 w-24 object-cover rounded-md border-2 border-gray-300"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -191,7 +234,7 @@ const FormField = ({
             placeholder={placeholder}
             register={register}
             validation={validation}
-            // data={data || ""}
+            data={data || ""}
           />
         );
       case "select":
@@ -202,7 +245,7 @@ const FormField = ({
             register={register}
             validation={validation}
             options={options}
-            // data={data || ""}
+            data={data || ""}
           />
         );
       case "file":
@@ -212,7 +255,7 @@ const FormField = ({
             register={register}
             validation={validation}
             multiple={multiple} // Truyền prop multiple
-            // data={data || []}
+            data={data || []}
           />
         );
       default:
@@ -223,7 +266,7 @@ const FormField = ({
             type={type}
             register={register}
             validation={validation}
-            // data={data || ""}
+            data={data || ""}
           />
         );
     }

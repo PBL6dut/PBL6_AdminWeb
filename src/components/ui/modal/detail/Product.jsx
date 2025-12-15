@@ -23,7 +23,6 @@ const Product = ({
   size = "xl",
 }) => {
   if (!data) return null;
-  console.log(data);
 
   const Information = () => {
     const { images, name, price, description, status } = data;
@@ -32,7 +31,7 @@ const Product = ({
       <div className="flex justify-between mb-6">
         <div className="flex gap-4 max-w-xl">
           <img
-            src={(images && formatImageUrl(images[0])) || furnitureDefault}
+            src={(images && images[0] && formatImageUrl(typeof images[0] === 'object' ? images[0].url : images[0])) || furnitureDefault}
             alt="image"
             className="w-36 h-36 rounded-lg object-cover"
             onError={(e) => {
@@ -110,7 +109,7 @@ const Product = ({
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((imgUrl, index) => (
             <img
-              src={formatImageUrl(imgUrl)}
+              src={formatImageUrl(typeof imgUrl === 'object' ? imgUrl.url : imgUrl)}
               key={index}
               className="h-auto max-w-full rounded-lg"
             />

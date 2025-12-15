@@ -32,10 +32,18 @@ export const getAllCategories = async () => {
 
 export const createProduct = async (productData) => {
     try {
-        const response = await axios.post("/products", productData);
+        const response = await axios.post("/products", productData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response;
     } catch (error) {
         console.error("Error creating product:", error);
+        // Return error response thay vì throw để headingConfigs có thể xử lý
+        if (error.response) {
+            return error.response.data;
+        }
         throw error;
     }
 }

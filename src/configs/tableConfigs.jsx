@@ -4,9 +4,16 @@ import avatarDefault from "../assets/avatar-default.jpg";
 import { StatusBadge } from "../components/ui/StatusBadge";
 
 const tableConfigs = (data) => {
+    // Đảm bảo data luôn an toàn
+    const safeData = {
+      products: Array.isArray(data?.products) ? data.products : [],
+      orders: Array.isArray(data?.orders) ? data.orders : [],
+      customers: Array.isArray(data?.customers) ? data.customers : [],
+    };
+
     const products = {
       headings: ["Sản phẩm", "Danh mục", "Giá", "Tồn kho", "Trạng thái"],
-      data: (data && data.products) || [],
+      data: safeData.products,
       renderedRows: (item) => [
         <div className="flex">
           <img
@@ -40,7 +47,7 @@ const tableConfigs = (data) => {
         "Tổng tiền",
         "Trạng thái",
       ],
-      data: (data && data.orders) || [],
+      data: safeData.orders,
       renderedRows: (item) => [
         <div>
           <p>{item.order_number || "N/A"}</p>
@@ -56,7 +63,7 @@ const tableConfigs = (data) => {
             {findNameById(
               "products",
               item.order_details[0].product_id,
-              data.products
+              safeData.products
             )}{" "}
             {item.order_details.length > 1 &&
               ` + ${item.order_details.length - 1} sản phẩm khác`}
@@ -75,7 +82,7 @@ const tableConfigs = (data) => {
         "Tổng chi tiêu",
         "Đơn gần nhất",
       ],
-      data: (data && data.customers) || [],
+      data: safeData.customers,
       renderedRows: (item) => [
         <div className="flex">
           <img

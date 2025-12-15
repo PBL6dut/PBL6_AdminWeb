@@ -11,7 +11,8 @@ export const ModalProvider = ({ children }) => {
     notification: { isOpen: false, context: null },
   });
 
-  const { setChoosenObject } = useContext(DataContext);
+  // Lấy DataContext khi cần, không phải ngay khi mount
+  const dataContext = useContext(DataContext);
 
   // Generic modal actions
   const openModal = useCallback((modalType, context = null, objectType) => {
@@ -26,8 +27,11 @@ export const ModalProvider = ({ children }) => {
       ...prev,
       [modalType]: { isOpen: false, context: null,  },
     }));
-    setChoosenObject(null);
-  }, []);
+    // Chỉ gọi setChoosenObject nếu dataContext có sẵn
+    if (dataContext?.setChoosenObject) {
+      dataContext.setChoosenObject(null);
+    }
+  }, [dataContext]);
 
   const closeAllModals = useCallback(() => {
     setModals({
