@@ -11,15 +11,16 @@ import { Login } from "./components/ui/Login";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { Register } from "./components/ui/Register";
 import { AuthProvider } from "./contexts/AuthContext";
+import { RootRedirect } from "./components/RootRedirect";
 // import { ProductForm } from "./components/ui/Form";
-import { FormModal } from "./components/ui/modal/form/FormModal";
+// import { FormModal } from "./components/ui/modal/form/FormModal";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<FormModal />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
