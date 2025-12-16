@@ -1,5 +1,4 @@
 import { apiSlice } from "./baseApi";
-import { countCustomers } from "./userService";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

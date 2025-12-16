@@ -1,5 +1,4 @@
 import { Form } from "../components/ui/Form";
-import { updateProduct } from "../services/productService";
 import { getProductFormSchema } from "./formConfigs";
 
 
