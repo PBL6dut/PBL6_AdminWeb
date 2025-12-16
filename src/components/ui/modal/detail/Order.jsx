@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import DataContext from "../../../../contexts/DataContext";
 import furnitureDefault from "../../../../assets/furniture-default.png";
 import {
   FaEnvelope,
@@ -20,41 +19,50 @@ import {
 } from "../../../../utils";
 import { InformationCard, StatisticsCard } from "../../Card";
 import { StatusBadge } from "../../StatusBadge";
-import Modal from '../BaseModal'
+import Modal from "../BaseModal";
+import { get } from "react-hook-form";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const Order = ({
-  isOpen,
-  onClose,
-  data,
-  title = "Chi tiết đơn hàng",
-  size = "xl",
-}) => {
-  if (!data) return <p>Loading...</p>;
+const Order = ({ item }) => {
+  if (!item) return <p>Loading...</p>;
 
   const Information = () => {
+    const getStatusBadge = (status) => {
+      switch (status) {
+        case "pending":
+          return <StatusBadge variant="yellow">Đang xử lý</StatusBadge>;
+        case "cancelled":
+          return <StatusBadge variant="red">Đã huỷ</StatusBadge>;
+        case "confirmed":
+          return <StatusBadge variant="green">Đã xác nhận</StatusBadge>;
+        case "shipping":
+          return <StatusBadge variant="green">Đang giao</StatusBadge>;
+        case "completed":
+          return <StatusBadge variant="bold_green">Hoàn thành</StatusBadge>;
+      }
+    }
     return (
       <div className="flex justify-between items-center mb-4">
         <div className="gap-2">
           <h3 className="text-lg font-semibold text-gray-900">
-            Đơn hàng {data.order_number}
+            Đơn hàng {item.order_number}
           </h3>
           <p className="text-sm text-black">
-            Đặt lúc: {formatDate(data.order_date)}
+            Đặt lúc: {formatDate(item.order_date)}
           </p>
         </div>
         <div className="gap-2 text-right">
           <h2 className="text-2xl font-bold text-gray-900 mt-4">
-            {formatPrice(data.total_amount)}
+            {formatPrice(item.total_amount)}
           </h2>
-          <StatusBadge>{data.status}</StatusBadge>
+          {getStatusBadge(item.status)}
         </div>
       </div>
     );
   };
 
   const CustomerCard = () => {
-    const customer = data.customer || {};
+    const customer = item.customer || {};
     if (!customer) return null;
 
     const content = {
@@ -72,7 +80,7 @@ const Order = ({
       },
       address: {
         Icon: <FaLocationDot className="text-orange-700" />,
-        value: data.shipping_address,
+        value: item.shipping_address,
       },
     };
 
@@ -80,24 +88,24 @@ const Order = ({
   };
 
   const OrderCard = () => {
-    if (!data) return null;
+    if (!item) return null;
 
     const content = {
       payment_method: {
         Icon: <FaCreditCard className="text-purple-700" />,
-        value: formatOrderData(data.payment_method),
+        value: formatOrderData(item.payment_method),
       },
       shipping_method: {
         Icon: <FaTruck className="text-blue-700" />,
-        value: formatOrderData(data.shipping_method),
+        value: formatOrderData(item.shipping_method),
       },
       expected_delivery_date: {
         Icon: <FaCalendar className="text-green-700" />,
-        value: formatDate(data.expected_delivery_date),
+        value: formatDate(item.expected_delivery_date),
       },
       notes: {
         Icon: <FaNoteSticky className="text-yellow-400" />,
-        value: data.notes,
+        value: item.notes,
       },
     };
 
@@ -105,18 +113,9 @@ const Order = ({
   };
 
   const ProductList = () => {
-    const { order_details } = data || [];
+    const { order_details } = item || [];
 
-    const products = useContext(DataContext).data.products || [];
-
-    const details = order_details.map((detail) => {
-      const product_name = findNameById("product", detail.product_id, products);
-      const product_image =
-        formatImageUrl(
-          products.find((p) => p.id === detail.product_id).images[0]
-        ) || furnitureDefault;
-      return { ...detail, product_name, product_image };
-    });
+    const products = order_details.map((detail) => detail.product) || [];
 
     if (!order_details || order_details.length === 0) {
       return <p>Không có sản phẩm nào trong đơn hàng.</p>;
@@ -127,10 +126,10 @@ const Order = ({
           <h3 className="text-lg font-semibold text-gray-900">
             Sản phẩm đặt mua
           </h3>
-          <p className="text-sm text-black mb-2">({details.length} sản phẩm)</p>
+          <p className="text-sm text-black mb-2">({order_details.length} sản phẩm)</p>
         </div>
         <div>
-          {details.map((detail, index) => {
+          {products.map((product, index) => {
             return (
               <div
                 key={index}
@@ -138,23 +137,23 @@ const Order = ({
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={detail.product_image || furnitureDefault}
-                    alt={detail.product_name}
+                    src={product.images?.[0]?.url || furnitureDefault}
+                    alt={product.name}
                     className="w-16 h-16 object-cover"
                     onError={(e) => {
                       e.target.src = furnitureDefault;
                     }}
                   />
                   <div>
-                    <p>{detail.product_name}</p>
-                    <p>Số lượng: {detail.quantity}</p>
+                    <p>{product.name}</p>
+                    <p>Số lượng: {order_details[index].quantity}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-gray-900">
-                    {formatPrice(detail.unit_price)}
+                    {formatPrice(order_details[index].unit_price)}
                   </p>
-                  <p>Tổng: {formatPrice(detail.total_price)}</p>
+                  <p>Tổng: {formatPrice(order_details[index].total_price)}</p>
                 </div>
               </div>
             );
@@ -162,13 +161,13 @@ const Order = ({
           <div className="p-2 flex justify-between border-b border-gray-300">
             <p className="text-right text-md">Phí vận chuyển: </p>
             <p className="text-right text-md text-black">
-              {formatPrice(data.shipping_fee)}
+              {formatPrice(item.shipping_fee)}
             </p>
           </div>
           <div className="p-2 flex justify-between">
             <p className="text-right text-lg">Tổng cộng: </p>
             <p className="text-right text-lg text-black">
-              {formatPrice(data.total_amount)}
+              {formatPrice(item.total_amount)}
             </p>
           </div>
         </div>
@@ -176,14 +175,14 @@ const Order = ({
     );
   };
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size={size}>
+    <>
       <Information />
       <div className="grid grid-cols-2 gap-4 mb-4">
         <CustomerCard />
         <OrderCard />
       </div>
       <ProductList />
-    </Modal>
+    </>
   );
 };
 

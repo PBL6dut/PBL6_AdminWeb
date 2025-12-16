@@ -3,7 +3,6 @@ import Modal from './BaseModal'
 import { Button } from '../Button'
 
 export const ConfirmModal = ({
-  isOpen,
   onClose,
   title = "Xác nhận",
   message,
@@ -63,7 +62,6 @@ export const ConfirmModal = ({
   const styles = getTypeStyles();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
       <div className="text-center">
         {/* Icon */}
         <div
@@ -91,6 +89,5 @@ export const ConfirmModal = ({
           {styles.confirmBtn}
         </div>
       </div>
-    </Modal>
   );
 };

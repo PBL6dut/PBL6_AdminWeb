@@ -17,6 +17,12 @@ export const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }, [isAuthenticated]);
+
   const {
     register,
     handleSubmit,
@@ -24,12 +30,20 @@ export const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    await login(data.email, data.password);
+    try {
+      const response = await login(data.email, data.password);
+      if (response.success) {
+        console.log("Login successful, navigating to dashboard"); // ✅ Thêm
+        navigate("/dashboard"); // Sử dụng navigate để chuyển hướng
+      } else {
+        alert(response.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("CATCH ERROR in onSubmit:", error); // ✅ Thêm
+      alert("An error occurred during login");
+    }
   };
 
-  // if (isAuthenticated) {
-  //   return <Navigate to="/dashboard" replace />; // Điều hướng nếu người dùng đã đăng nhập
-  // }
   return (
     <>
       <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -39,12 +53,11 @@ export const Login = () => {
           </h1>
           <form
             className="space-y-4 md:space-y-6"
-            action="#"
             onSubmit={handleSubmit(onSubmit)}
           >
             <div>
               <label
-                for="email"
+                htmlFor="email"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Your email
@@ -63,7 +76,6 @@ export const Login = () => {
                   "border-red-500 focus:ring-red-500 focus:border-red-500"
                 } block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                 placeholder="name@company.com"
-                required
               />
               {errors && errors.email && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -73,7 +85,7 @@ export const Login = () => {
             </div>
             <div>
               <label
-                for="password"
+                htmlFor="password"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Password
@@ -90,7 +102,6 @@ export const Login = () => {
                     errors.password &&
                     "border-red-500 focus:ring-red-500 focus:border-red-500"
                   } block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
-                  // required
                 />
                 <IconButton
                   icon={showPassword ? <FaEye /> : <FaEyeSlash />}
@@ -116,12 +127,13 @@ export const Login = () => {
             <Button
               variant="green"
               type="submit"
-              className="w-full hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
               Sign in
             </Button>
             <Button
               variant="light"
+              type="button"
               className="w-full hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 font-bold rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
             >
               <div className="flex items-center justify-center">
@@ -131,10 +143,15 @@ export const Login = () => {
             </Button>
             <Button
               variant="light"
+              type="button"
               className="w-full hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 font-bold rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
             >
               <div className="flex items-center justify-center">
-                <img src={facebookIcon} alt="Facebook Icon" className="size-5" />
+                <img
+                  src={facebookIcon}
+                  alt="Facebook Icon"
+                  className="size-5"
+                />
                 <span className="mx-2">Sign in with Facebook</span>
               </div>
             </Button>

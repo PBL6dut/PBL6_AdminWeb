@@ -14,36 +14,6 @@ const variantClasses = {
 };
 
 export const StatusBadge = ({ variant = "default", children, className, ...props }) => {
-  switch (children) {
-    case "active":
-      variant = "bold_green";
-      children = "Đang bán";
-      break;
-    case "inactive":
-      variant = "red";
-      children = "Ngừng bán";
-      break;
-    case "completed":
-      variant = "bold_green";
-      children = "Hoàn thành";
-      break;
-    case "shipping":
-      variant = "bold_green";
-      children = "Đang giao";
-      break;
-    case "confirmed":
-      variant = "bold_green";
-      children = "Đã xác nhận";
-      break;
-    case "pending":
-      variant = "bold_green";
-      children = "Đang xử lý";
-      break;
-    case "cancelled":
-      variant = "red";
-      children = "Đã huỷ";
-      break;
-  }
   return (
     <span
       className={clsx(

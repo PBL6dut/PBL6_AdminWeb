@@ -1,24 +1,14 @@
 import { useContext } from "react";
-import DataContext from "../contexts/DataContext";
+// import DataContext from "../contexts/DataContext";
 import { deleteProduct } from "../services/productService";
+import { ConfirmModal } from "../components/ui/modal/ConfirmModal";
 
-const onDeleteConfigs = (openModal, deleteObject, closeModal) => {
-  const products = ({ object }) => {
-    openModal("confirm", {
-      type: "danger",
-      message: "Bạn có chắc chắn muốn xóa sản phẩm này?",
-      onConfirm: async () => {
-        const response = await deleteProduct(object.id);
-        if (response.success) {
-          deleteObject("products", object);
-          closeModal("confirm");
-          openModal('notification', {message: 'Xoá sản phẩm thành công!', type: 'success'});
-        }
-      },
-    });
-  };
-
-    return { products }
+const OpenConfirmDeleteProductModal = (openModal, closeModal, onConfirm) => {
+  openModal(
+    <ConfirmModal onClose={closeModal} onConfirm={onConfirm} type="danger" title="Xác nhận xoá sản phẩm?" message="Hành động này không thể hoàn tác." />,
+    "",
+    "sm"
+  );
 };
 
-export default onDeleteConfigs;
+export { OpenConfirmDeleteProductModal };

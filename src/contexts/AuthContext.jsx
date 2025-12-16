@@ -1,56 +1,71 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import authService from "../services/authService";
+import { set } from "react-hook-form";
+import { Navigate, useNavigate } from "react-router-dom";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const storedToken = localStorage.getItem('token') || ""
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
-    const [token, setToken] = useState(storedToken)
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  console.log('authcontext')
 
-    const login = async (email, password) => {
-        try {
-            const response = await authService.login(email, password)
-            if(response && response.success) {
-                const token = response.data.token
-                localStorage.setItem('token', token)
-                setToken(token)
-                setIsAuthenticated(true)
-            }
-        } catch (error) {
-            console.error("Login failed:", error)
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const response = await authService.verifyToken(token);
+          if (response && response.success) {
+            const userData = response.data.admin;
+            setUser(userData);
+          } else {
+            localStorage.removeItem("token");
+            setUser(null);
+          }
         }
+      } catch (error) {
+        localStorage.removeItem("token");
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const response = await authService.login(email, password);
+      if (response && response.success) {
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        setUser(response.data.admin);
+        return { success: true };
+      } else {
+        return { success: false, message: response.message };
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      return { success: false, message: error.message };
     }
+  };
 
-    const logout = () => {
-        localStorage.removeItem('token')
-        setToken(null)
-        setIsAuthenticated(false)
-    }
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    return <Navigate to="/auth/login" replace />;
+  };
 
-    // const verifyToken = async (token) => {
-    //     try {
-    //         const response = await authService.verifyToken(token)
-    //         if(response && response.status === 200) {
-    //             setIsAuthenticated(true)
-    //         } else {
-    //             logout()
-    //         }
-    //     } catch (error) {
-    //         console.error("Token verification failed:", error)
-    //         logout()
-    //     }
-    // }
+  return (
+    <AuthContext.Provider
+      value={{ user, isLoading, login, logout, isAuthenticated: !!user }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-    // if(storedToken) {
-    //     verifyToken(storedToken)
-    // }
-
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    )
-}
-
-export default AuthContext
+export default AuthContext;

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { FaEye, FaPenToSquare, FaRegTrashCan } from "react-icons/fa6";
-import DataContext from "../../contexts/DataContext";
+// import DataContext from "../../contexts/DataContext";
 import { useContext } from "react";
 
 const variantClasses = {
@@ -40,6 +40,7 @@ export const Button = ({
       )}
       {...props}
     >
+      {Icon && <Icon className="inline-block me-2" />}
       {children}
     </button>
   );
@@ -54,11 +55,11 @@ export const IconButton = ({
 }) => {
   let Icon;
   let color;
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    return null;
-  }
-  const { choosenObject, setChoosenObject } = context;
+  // const context = useContext(DataContext);
+  // if (context === undefined) {
+  //   return null;
+  // }
+  // const { choosenObject, setChoosenObject } = context;
   switch (iconType) {
     case "edit":
       Icon = FaPenToSquare;
@@ -77,10 +78,7 @@ export const IconButton = ({
   }
   return (
     <button
-      onClick={() => {
-        setChoosenObject(object);
-        handleClick(choosenObject);
-      }}
+      onClick={handleClick}
       type="button"
       className={clsx("cursor-pointer mx-2", className)}
       {...props}

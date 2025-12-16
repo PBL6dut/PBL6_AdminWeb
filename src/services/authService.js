@@ -13,7 +13,7 @@ const login = async (email, password) => {
 
 const verifyToken = async (token) => {
     try {
-        const response = await axios.post('/auth/admin/verify-token', { token })
+        const response = await axios.get('/auth/admin/verify-token', { token })
         return response
     } catch (error) {
         console.error("Token verification failed:", error)

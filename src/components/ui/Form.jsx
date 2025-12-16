@@ -3,21 +3,19 @@ import { Button } from "../ui/Button";
 import { useEffect, useState } from "react";
 import { formatImageUrl } from "../../utils";
 
-export const Form = ({ formSchema, onSubmit, initialData = {} }) => {
+export const Form = ({ formSchema, onSubmit, onClose }) => {
   const {
     register,
     handleSubmit,
     formState: { errors, dirtyFields },
-  } = useForm({
-    defaultValues: initialData,
-  });
-  const keys = Object.keys(formSchema).filter((key) => key !== "objectType");
+  } = useForm({});
+  const keys = Object.keys(formSchema);
+  const handleFormSubmit = (data) => {
+    onSubmit(data);
+  }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      encType="multipart/form-data"
-    >
+    <form onSubmit={handleSubmit(handleFormSubmit)} encType="multipart/form-data">
       <div className="mt-4 grid grid-cols-2 gap-4 bg-gray-200 rounded-lg p-4 shadow-sm">
         {keys.map((key) => (
           <div key={key}>
@@ -30,10 +28,12 @@ export const Form = ({ formSchema, onSubmit, initialData = {} }) => {
               validation={formSchema[key].validation}
               options={formSchema[key].options}
               multiple={formSchema[key].multiple || false} // Truyền prop multiple từ schema
-              // data={initialData[key] || ""}
+              defaultValue={formSchema[key].defaultValue}
             />
             {errors[formSchema[key].name] && (
-              <p className="text-red-500 text-sm mt-1">{errors[formSchema[key].name].message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors[formSchema[key].name].message}
+              </p>
             )}
           </div>
         ))}
@@ -44,6 +44,9 @@ export const Form = ({ formSchema, onSubmit, initialData = {} }) => {
           value="Xác nhận"
           className="cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none focus:ring-4 text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
         />
+        <Button variant="red" onClick={onClose}>
+          Hủy
+        </Button>
       </div>
     </form>
   );
@@ -51,7 +54,7 @@ export const Form = ({ formSchema, onSubmit, initialData = {} }) => {
 
 const Label = ({ text }) => {
   return (
-    <label className="" for="">
+    <label className="" htmlFor="">
       {text}
     </label>
   );
@@ -63,14 +66,14 @@ const Input = ({
   register,
   name,
   validation = {},
-  data = "",
+  defaultValue = "",
 }) => {
   return (
     <input
       placeholder={placeholder}
       class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
       type={type}
-      // defaultValue={data}
+      defaultValue={defaultValue}
       {...register(name, validation)}
     />
   );
@@ -81,29 +84,29 @@ const Textarea = ({
   register,
   name,
   validation = {},
-  data = "",
+  defaultValue = "",
 }) => {
   return (
     <textarea
       placeholder={placeholder}
       class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
-      // defaultValue={data}
+      defaultValue={defaultValue}
       {...register(name, validation)}
     ></textarea>
   );
 };
 
-const Select = ({ options, register, name, validation = {}, data = "" }) => {
+const Select = ({ options, register, name, validation = {}, defaultValue = "" }) => {
   return (
     <select
-      class="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
+      className="w-full bg-white rounded-md border-gray-300 text-black px-2 py-1"
       {...register(name, validation)}
+      defaultValue={defaultValue}
     >
       {options.map((option) => (
         <option
           key={option.value}
           value={option.value}
-          // selected={option.value === data}
         >
           {option.label}
         </option>
@@ -180,7 +183,7 @@ const FormField = ({
   validation,
   options = [],
   multiple = false, // Thêm prop multiple
-  data,
+  defaultValue = "",
 }) => {
   const getInputField = () => {
     switch (type) {
@@ -191,7 +194,7 @@ const FormField = ({
             placeholder={placeholder}
             register={register}
             validation={validation}
-            // data={data || ""}
+            defaultValue= {defaultValue}
           />
         );
       case "select":
@@ -202,7 +205,7 @@ const FormField = ({
             register={register}
             validation={validation}
             options={options}
-            // data={data || ""}
+            defaultValue={defaultValue}
           />
         );
       case "file":
@@ -223,7 +226,7 @@ const FormField = ({
             type={type}
             register={register}
             validation={validation}
-            // data={data || ""}
+            defaultValue={defaultValue}
           />
         );
     }

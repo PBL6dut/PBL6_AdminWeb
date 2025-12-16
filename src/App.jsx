@@ -1,39 +1,36 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Dashboard } from "./pages/Dashboard";
-import { ModalProvider } from "./contexts/ModalContext";
-import { DataProvider } from "./contexts/DataContext";
-import { Modals } from "./components/ui/modal/Modal";
-import { ResourcePageProvider } from "./contexts/ResourcePageContext";
-import { Resource } from "./pages/Resource";
 import { AIAnalysis } from "./pages/AIAnalysis";
-import { Login } from "./components/ui/Login";
 import { AuthLayout } from "./layouts/AuthLayout";
-import { Register } from "./components/ui/Register";
 import { AuthProvider } from "./contexts/AuthContext";
 // import { ProductForm } from "./components/ui/Form";
-import { FormModal } from "./components/ui/modal/form/FormModal";
+import { Login } from "./components/auth/Login";
+import { Register } from "./components/auth/Register";
+import Product from "./pages/ProductPage";
+import Customer from "./pages/CustomerPage";
+import Order from "./pages/OrderPage";
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<FormModal />} />
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-          </Route>
-          <Route path="/dashboard" element={<MainLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="products" element={<Resource />} />
-            <Route path="orders" element={<Resource />} />
-            <Route path="customers" element={<Resource />} />
-            <Route path="ai-analysis" element={<AIAnalysis />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" />
+            <Route path="/auth" element={<AuthLayout />}>
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+            </Route>
+            <Route path="/dashboard" element={<MainLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="products" element={<Product />} />
+              <Route path="orders" element={<Order />} />
+              <Route path="customers" element={<Customer />} />
+              <Route path="ai-analysis" element={<AIAnalysis />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
   );
 }
 

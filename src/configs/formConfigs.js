@@ -1,18 +1,21 @@
-const formConfigs = (data) => {
-  const products = {
-    objectType: "sản phẩm",
+
+export const getProductFormSchema = (initialValues, categories=[]) => {
+  console.log(categories);
+  return {
     name: {
       name: "name",
       label: "Tên sản phẩm",
       type: "text",
       placeholder: "Nhập tên sản phẩm",
       validation: { required: "Tên sản phẩm là bắt buộc" },
+      defaultValue: initialValues?.name || "",
     },
     description: {
       name: "description",
       label: "Mô tả",
       type: "textarea",
       placeholder: "Nhập mô tả sản phẩm",
+      defaultValue: initialValues?.description || "",
     },
     price: {
       name: "price",
@@ -24,18 +27,20 @@ const formConfigs = (data) => {
         min: { value: 0, message: "Giá không được âm" },
         pattern: { value: /^\d+$/, message: "Giá phải là số nguyên" },
       },
+      defaultValue: initialValues?.price || "",
     },
     category_id: {
       name: "category_id",
       label: "Danh mục",
       type: "select",
       options:
-        data && data.categories
-          ? data.categories.map((category) => ({
+        categories
+          ? categories.map((category) => ({
               value: category.id,
               label: category.name,
             }))
           : [],
+      defaultValue: initialValues?.category?.id || "",
     },
     images: {
       name: "image_url",
@@ -43,6 +48,7 @@ const formConfigs = (data) => {
       type: "file",
       multiple: true, // Thêm thuộc tính này để cho phép chọn nhiều file
       validation: { required: "Vui lòng chọn hình ảnh" },
+      defaultValue: initialValues?.images || [],
     },
     stock_quantity: {
       name: "stock_quantity",
@@ -53,12 +59,14 @@ const formConfigs = (data) => {
         required: "Số lượng hàng tồn kho là bắt buộc",
         min: { value: 1, message: "Số lượng hàng tồn kho phải lớn hơn 0" },
       },
+      defaultValue: initialValues?.stock_quantity || "",
     },
     material: {
       name: "material",
       label: "Chất liệu",
       type: "text",
       placeholder: "Nhập chất liệu sản phẩm",
+      defaultValue: initialValues?.material || "",
     },
     height: {
       name: "height",
@@ -69,6 +77,7 @@ const formConfigs = (data) => {
         required: "Chiều cao là bắt buộc",
         min: { value: 0, message: "Chiều cao không được âm" },
       },
+      defaultValue: initialValues?.height || "",
     },
     weight: {
       name: "weight",
@@ -79,6 +88,7 @@ const formConfigs = (data) => {
         required: "Cân nặng là bắt buộc",
         min: { value: 0, message: "Cân nặng không được âm" },
       },
+      defaultValue: initialValues?.weight || "",
     },
     width: {
       name: "width",
@@ -89,6 +99,7 @@ const formConfigs = (data) => {
         required: "Chiều rộng là bắt buộc",
         min: { value: 0, message: "Chiều rộng không được âm" },
       },
+      defaultValue: initialValues?.width || "",
     },
     length: {
       name: "length",
@@ -100,6 +111,7 @@ const formConfigs = (data) => {
         min: { value: 0, message: "Chiều dài không được âm" },
         number: { value: true, message: "Chiều dài phải là số" },
       },
+      defaultValue: initialValues?.length || "",
     },
     color: {
       name: "color",
@@ -113,35 +125,8 @@ const formConfigs = (data) => {
         //   message: "Màu sắc không đúng định dạng",
         // },
       },
+      defaultValue: initialValues?.color || "",
     },
-  };
+  }
+}
 
-  const orders = {
-    objectType: "orders",
-    keys:
-      data && data.orders && data.orders.length > 0
-        ? Object.keys(data.orders[0]).filter((key) => key !== "status")
-        : [],
-    labels: ["Mã đơn hàng", "Ngày giao hàng", "Khách hàng", "Tổng tiền"],
-    onSubmit: () => {
-      alert("Submitted");
-    },
-  };
-
-  const customers = {
-    objectType: "customers",
-    keys:
-      data && data.customers && data.customers.length > 0
-        ? Object.keys(data.customers[0]).filter(
-            (key) => key !== "status" && key !== "created_at"
-          )
-        : [],
-    labels: ["Tên khách hàng", "Email", "SĐT", "Tổng chi tiêu", "Đơn gần nhất"],
-    onSubmit: () => {
-      alert("Submitted");
-    },
-  };
-  return { products, orders, customers };
-};
-
-export default formConfigs;

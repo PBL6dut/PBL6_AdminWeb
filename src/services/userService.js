@@ -20,3 +20,13 @@ export const getCustomerById = async (id) => {
         throw error;
     }
 }
+
+export const countCustomers = async () => {
+  try {
+    const response = await axios.get("/users/customers/count");
+    return response;
+  } catch (error) {
+    console.error("Error counting customers:", error);
+    throw error;
+  }
+};

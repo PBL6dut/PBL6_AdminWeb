@@ -13,7 +13,7 @@ const calculateSum = (values) => {
 };
 
 const calculateTotalSpent = (orders) => {
-  return orders.reduce((total, order) => total + order.total_amount, 0);
+  return orders.reduce((total, order) => total + Number(order.total_amount), 0);
 }
 
 const findNameById = (objectType, id, objectArr) => {

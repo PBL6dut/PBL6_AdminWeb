@@ -17,7 +17,7 @@ export const Register = () => {
         <form class="space-y-4 md:space-y-6" action="#">
           <div>
             <label
-              for="email"
+              htmlFor="email"
               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Your email
@@ -33,7 +33,7 @@ export const Register = () => {
           </div>
           <div>
             <label
-              for="password"
+              htmlFor="password"
               class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Password

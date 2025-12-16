@@ -1,23 +1,23 @@
 import { Sidebar } from "../components/Sidebar";
 // import { Content } from "../components/Content"
-import { Navigate, Outlet } from "react-router-dom";
-import { DataProvider } from "../contexts/DataContext";
-import { ResourcePageProvider } from "../contexts/ResourcePageContext";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { ModalProvider } from "../contexts/ModalContext";
-import { Modals } from "../components/ui/modal/Modal";
+import Modal from "../components/ui/modal/Modal";
 import AuthContext from "../contexts/AuthContext";
 import { useContext } from "react";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 export const MainLayout = () => {
+  const location = useLocation();
   const { isAuthenticated } = useContext(AuthContext);
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />; // Render child routes (e.g., Login page) if not authenticated
+    return <Navigate to="/auth/login" state={{ from: location }} replace />; // Render child routes (e.g., Login page) if not authenticated
   }
 
   return (
-    <DataProvider>
+    // <DataProvider>
       <ModalProvider>
-        <ResourcePageProvider>
+        {/* <ResourcePageProvider> */}
           <div className="min-h-screen bg-gray-100">
             <Sidebar />
             {/* <Content /> */}
@@ -27,9 +27,7 @@ export const MainLayout = () => {
               </div>
             </div>
           </div>
-          <Modals />
-        </ResourcePageProvider>
+          <Modal />
       </ModalProvider>
-    </DataProvider>
   );
 };

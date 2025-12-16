@@ -1,26 +1,25 @@
-import { FaCalendar, FaEnvelope, FaLocationDot, FaPhone } from "react-icons/fa6";
+import {
+  FaCalendar,
+  FaEnvelope,
+  FaLocationDot,
+  FaPhone,
+} from "react-icons/fa6";
 import avatarDefault from "../../../../assets/avatar-default.jpg";
 import {
   calculateTotalSpent,
   formatDate,
   formatPrice,
 } from "../../../../utils";
-import Modal from '../BaseModal'
+import Modal from "../BaseModal";
 import { StatisticsCard } from "../../Card";
 import { StatusBadge } from "../../StatusBadge";
 
-const Customer = ({
-  isOpen,
-  onClose,
-  data,
-  title = "Chi tiết khách hàng",
-  size = "xl",
-}) => {
-  if (!data) return null;
-  console.log(data);
+const Customer = ({ item }) => {
+  if (!item) return null;
+  console.log(item);
 
   const Information = () => {
-    const { avatar, full_name, email, phone, address, created_at } = data;
+    const { avatar, full_name, email, phone, address, created_at } = item;
     return (
       <div className="flex gap-4 mb-6">
         <img
@@ -53,7 +52,7 @@ const Customer = ({
   };
 
   const Statistic = () => {
-    const orders = data.orders || [];
+    const orders = item.orders || [];
     const totalOrders = orders.length || "0";
     const totalSpent = calculateTotalSpent(orders) || "0";
     const avgOrderValue =
@@ -61,7 +60,7 @@ const Customer = ({
     const recentOrder =
       orders.length > 0 ? formatDate(orders[0].order_date) : "N/A";
     return (
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <StatisticsCard title="Tổng đơn hàng" content={totalOrders} />
         <StatisticsCard
           title="Tổng chi tiêu"
@@ -77,7 +76,23 @@ const Customer = ({
   };
 
   const OrdersTable = () => {
-    const orders = data.orders || [];
+    const getStatusBadge = (status) => {
+      switch (status) {
+        case "pending":
+          return <StatusBadge variant="yellow">Đang xử lý</StatusBadge>;
+        case "completed":
+          return <StatusBadge variant="bold_green">Hoàn thành</StatusBadge>;
+        case "cancelled":
+          return <StatusBadge variant="red">Đã hủy</StatusBadge>;
+        case "shipping":
+          return <StatusBadge variant="green">Đang giao hàng</StatusBadge>;
+        case "confirmed":
+          return <StatusBadge variant="green">Đã xác nhận</StatusBadge>;
+        default:
+          return <StatusBadge>Khác</StatusBadge>;
+      }
+    }
+    const orders = item.orders || [];
     if (orders.length === 0) {
       return <p>Khách hàng chưa có đơn hàng nào.</p>;
     }
@@ -114,7 +129,7 @@ const Customer = ({
                   {formatPrice(order.total_amount)}
                 </td>
                 <td className="px-4 py-2 border-b border-gray-300">
-                  <StatusBadge>{order.status}</StatusBadge>
+                  {getStatusBadge(order.status)}
                 </td>
               </tr>
             ))}
@@ -125,11 +140,11 @@ const Customer = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size={size}>
+    <>
       <Information />
       <Statistic />
       <OrdersTable />
-    </Modal>
+    </>
   );
 };
 

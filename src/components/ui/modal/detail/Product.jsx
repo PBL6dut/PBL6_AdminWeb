@@ -11,28 +11,28 @@ import {
 import furnitureDefault from "../../../../assets/furniture-default.png";
 import { formatDate, formatImageUrl, formatPrice } from "../../../../utils";
 import { InformationCard, StatisticsCard } from "../../Card";
-import DataContext from "../../../../contexts/DataContext";
 import { StatusBadge } from "../../StatusBadge";
 import Modal from "../BaseModal";
 
-const Product = ({
-  isOpen,
-  onClose,
-  data,
-  title = "Chi tiết sản phẩm",
-  size = "xl",
-}) => {
-  if (!data) return null;
-  console.log(data);
+const Product = ({ item }) => {
+  if (!item) return null;
+  console.log(item);
 
   const Information = () => {
-    const { images, name, price, description, status } = data;
+    const { images, name, price, description, status } = item;
+    const getStatusBadge = (status) => {
+      if (status === "active") {
+        return <StatusBadge variant="bold_green">Đang bán</StatusBadge>;
+      } else {
+        return <StatusBadge variant="red">Hết hàng</StatusBadge>;
+      }
+    };
 
     return (
       <div className="flex justify-between mb-6">
         <div className="flex gap-4 max-w-xl">
           <img
-            src={(images && formatImageUrl(images[0])) || furnitureDefault}
+            src={images?.[0].url || furnitureDefault}
             alt="image"
             className="w-36 h-36 rounded-lg object-cover"
             onError={(e) => {
@@ -50,14 +50,22 @@ const Product = ({
           <h2 className="text-2xl font-bold text-gray-900">
             {formatPrice(price)}
           </h2>
-          <StatusBadge>{status}</StatusBadge>
+          {getStatusBadge(status)}
         </div>
       </div>
     );
   };
 
   const DetailCard = () => {
-    const { material, stock_quantity, created_at, color, height, width, length} = data;
+    const {
+      material,
+      stock_quantity,
+      created_at,
+      color,
+      height,
+      width,
+      length,
+    } = item;
 
     const content = {
       material: {
@@ -96,7 +104,7 @@ const Product = ({
   };
 
   const Images = () => {
-    const { images } = data;
+    const { images } = item;
     if (!images || images.length === 0) return null;
 
     return (
@@ -108,9 +116,9 @@ const Product = ({
       >
         <h3 className="font-semibold text-lg text-left mb-4">Thư viện ảnh</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {images.map((imgUrl, index) => (
+          {images?.map((img, index) => (
             <img
-              src={formatImageUrl(imgUrl)}
+              src={img.url || furnitureDefault}
               key={index}
               className="h-auto max-w-full rounded-lg"
             />
@@ -121,7 +129,7 @@ const Product = ({
   };
 
   const Statistics = () => {
-    const { order_details } = data || [];
+    const { order_details } = item || [];
 
     const totalSold =
       (order_details &&
@@ -153,10 +161,10 @@ const Product = ({
   };
 
   const OrderTable = () => {
-    const { order_details } = data || [];
-    const orders = useContext(DataContext).data.orders || [];
+    const { order_details } = item || [];
+    const orders = order_details?.map((detail) => detail.order) || [];
 
-    if (order_details.length === 0) {
+    if (!order_details || order_details.length === 0) {
       return <p>Sản phẩm chưa có đơn hàng nào.</p>;
     }
 
@@ -211,7 +219,7 @@ const Product = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size={size}>
+    <>
       <Information />
       <div className="grid grid-cols-3 gap-4 mb-4">
         <DetailCard />
@@ -219,7 +227,7 @@ const Product = ({
       </div>
       <Images />
       <OrderTable />
-    </Modal>
+    </>
   );
 };
 

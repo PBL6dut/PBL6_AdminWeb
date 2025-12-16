@@ -1,13 +1,10 @@
 import { Heading } from "../components/ui/Heading";
-import { FaPlus } from "react-icons/fa6";
 import { Card, StatisticsCard } from "../components/ui/Card";
 import {
   FaCube,
   FaCartShopping,
   FaUsers,
   FaChartColumn,
-  FaTableColumns,
-  FaArrowRightFromBracket,
 } from "react-icons/fa6";
 import {
   AreaChart,
@@ -21,13 +18,40 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useCountProductsQuery, useGetMostProductsByCategoryQuery } from "../services/product.api";
+import { useCountOrdersQuery, useGetTotalIncomeQuery } from "../services/order.api";
+import { useCountCustomersQuery } from "../services/user.api";
+import { formatPrice } from "../utils";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 export const Dashboard = () => {
+  const { data: productsCount, isLoading: productsCountLoading, error } = useCountProductsQuery(); // Replace with actual data fetching logic
+  const { data: ordersCount, isLoading: ordersCountLoading } = useCountOrdersQuery();
+  const { data: customersCount, isLoading: customersCountLoading } = useCountCustomersQuery();
+  const { data: totalIncome, isLoading: totalIncomeLoading } = useGetTotalIncomeQuery();
+  const { data: MostProductsByCategory, isLoading: MostProductsByCategoryLoading } = useGetMostProductsByCategoryQuery();
+
   const cards = [
-    { title: "Tổng sản phẩm", content: "1234", Icon: {icon: FaCube, color: "text-blue-600"} },
-    { title: "Đơn hàng mới", content: "5678", Icon: {icon: FaCartShopping, color: "text-green-600"} },
-    { title: "Khách hàng", content: "91011", Icon: {icon: FaUsers, color: "text-purple-600"} },
-    { title: "Doanh thu", content: "121314", Icon: {icon: FaChartColumn, color: "text-orange-600"} },
+    {
+      title: "Tổng sản phẩm",
+      content: productsCount || "0",
+      Icon: { icon: FaCube, color: "text-blue-600" },
+    },
+    {
+      title: "Đơn hàng mới",
+      content: ordersCount || "0",
+      Icon: { icon: FaCartShopping, color: "text-green-600" },
+    },
+    {
+      title: "Khách hàng",
+      content: customersCount || "0",
+      Icon: { icon: FaUsers, color: "text-purple-600" },
+    },
+    {
+      title: "Doanh thu",
+      content: formatPrice(totalIncome) || "0",
+      Icon: { icon: FaChartColumn, color: "text-orange-600" },
+    },
   ];
 
   const area_chart = [
@@ -75,38 +99,14 @@ export const Dashboard = () => {
     },
   ];
 
-  const column_chart = [
-    {
-      name: "Bàn làm việc",
-      uv: 18,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Kệ sách",
-      uv: 36,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Giường ngủ",
-      uv: 63,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Tủ quần áo",
-      uv: 69,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Bàn ăn",
-      uv: 96,
-      pv: 4800,
-      amt: 2181,
-    }
-  ];
+  const column_chart = MostProductsByCategory?.map((item) => ({
+    name: item.name,
+    uv: item.total_products,
+  }));
+
+  if (productsCountLoading || ordersCountLoading || customersCountLoading || totalIncomeLoading || MostProductsByCategoryLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -181,147 +181,12 @@ export const Dashboard = () => {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" className="text-sm"/>
+              <XAxis dataKey="name" className="text-sm" />
               <YAxis />
               <Tooltip />
               <Bar dataKey="uv" fill="rgba(0, 0, 139, 1)" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-      </div>
-      <div class="flex items-center justify-center h-48 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800">
-        <p class="text-2xl text-gray-400 dark:text-gray-500">
-          <svg
-            class="w-3.5 h-3.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 18 18"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 1v16M1 9h16"
-            />
-          </svg>
-        </p>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
-        </div>
-        <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-          <p class="text-2xl text-gray-400 dark:text-gray-500">
-            <svg
-              class="w-3.5 h-3.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
-          </p>
         </div>
       </div>
     </>
