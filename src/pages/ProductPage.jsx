@@ -13,10 +13,11 @@ import PaginationNav from "../components/ui/PaginationNav";
 import { useSearchParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { getProductStats } from "../configs/cardConfigs";
-import { Card, StatisticsCard } from "../components/ui/Card";
+import { StatisticsCard } from "../components/ui/Card";
 import { useContext } from "react";
 import ModalContext from "../contexts/ModalContext";
 import { OpenProductFormModal } from "../configs/onEditConfigs";
+import { buildProductFormData } from "../utils/form.utils";
 
 const ProductPage = () => {
   const [searchParams] = useSearchParams();
@@ -30,7 +31,6 @@ const ProductPage = () => {
   } = useGetCategoriesQuery();
   const products = data?.data || [];
   const categories = categoriesData;
-  // console.log(categories);
 
   const stats = getProductStats(products);
 
@@ -50,29 +50,9 @@ const ProductPage = () => {
         closeModal,
         null,
         async (formData) => {
-          // 1. Tạo đối tượng FormData
-          const payload = new FormData();
-
-          // 2. Duyệt qua từng key của dữ liệu form để append vào FormData
-          Object.keys(formData).forEach((key) => {
-            if (key === "image_url") {
-              // Xử lý riêng cho trường images (vì là FileList hoặc mảng)
-              if (formData[key] && formData[key].length > 0) {
-                // Nếu là FileList (từ input type file)
-                Array.from(formData[key]).forEach((file) => {
-                  // Chỉ append nếu đó thực sự là File mới (không phải URL ảnh cũ)
-                  if (file instanceof File) {
-                    payload.append("image_url", file);
-                  }
-                });
-              }
-            } else {
-              // Các trường text/number bình thường
-              payload.append(key, formData[key]);
-            }
-          });
-
-          // 3. Gọi API với payload là FormData
+          // Logic đã được rút gọn
+          const payload = buildProductFormData(formData);
+          // Gọi API
           await createProduct(payload)
             .unwrap()
             .then(() => closeModal());

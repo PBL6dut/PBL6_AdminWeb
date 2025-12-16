@@ -15,7 +15,6 @@ export const ConfirmModal = ({
     if (onConfirm) {
       onConfirm();
     }
-    onClose();
   };
 
   const getTypeStyles = () => {

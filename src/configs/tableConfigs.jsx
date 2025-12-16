@@ -22,6 +22,7 @@ import {
   useUpdateProductMutation,
 } from "../services/product.api";
 import { OpenConfirmDeleteProductModal } from "./onDeleteConfigs";
+import { buildProductFormData } from "../utils/form.utils";
 
 export const GetProductColumns = (categories = []) => {
   const { openModal, closeModal } = useContext(ModalContext);
@@ -96,31 +97,16 @@ export const GetProductColumns = (categories = []) => {
                 item,
                 async (formData) => {
                   // 1. Tạo đối tượng FormData
-                  const payload = new FormData();
-
-                  // 2. Duyệt qua từng key của dữ liệu form để append vào FormData
-                  Object.keys(formData).forEach((key) => {
-                    if (key === "image_url") {
-                      // Xử lý riêng cho trường images (vì là FileList hoặc mảng)
-                      if (formData[key] && formData[key].length > 0) {
-                        // Nếu là FileList (từ input type file)
-                        Array.from(formData[key]).forEach((file) => {
-                          // Chỉ append nếu đó thực sự là File mới (không phải URL ảnh cũ)
-                          if (file instanceof File) {
-                            payload.append("image_url", file);
-                          }
-                        });
-                      }
-                    } else {
-                      // Các trường text/number bình thường
-                      payload.append(key, formData[key]);
-                    }
-                  });
+                  const payload = buildProductFormData(formData);
 
                   // 3. Gọi API với payload là FormData
                   await updateProduct({ id: item.id, productData: payload })
                     .unwrap()
-                    .then(() => closeModal());
+                    .then(() => {
+                      if (updateResult.isSuccess) {
+                        closeModal();
+                      }
+                    });
                 },
                 categories
               )
@@ -131,9 +117,13 @@ export const GetProductColumns = (categories = []) => {
             iconType="delete"
             handleClick={() =>
               OpenConfirmDeleteProductModal(openModal, closeModal, async () => {
-                await deleteProduct(item.id)
-                  .unwrap()
-                  .then(() => closeModal());
+                try {
+                  await deleteProduct(item.id).unwrap();
+                  closeModal();
+                } catch (error) {
+                  console.error("Xoá thất bại:", error);
+                  // Có thể hiển thị thông báo lỗi (Toast) ở đây nếu cần
+                }
               })
             }
           />

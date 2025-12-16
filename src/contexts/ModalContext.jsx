@@ -5,12 +5,6 @@ import Customer from "../components/ui/modal/detail/Customer";
 const ModalContext = createContext();
 
 export const ModalProvider = ({ children }) => {
-  // const [modals, setModals] = useState({
-  //   form: { isOpen: false, context: null },
-  //   confirm: { isOpen: false, context: null },
-  //   detail: { isOpen: false, context: null, objectType: null },
-  //   notification: { isOpen: false, context: null },
-  // });
   const [modal, setModal] = useState({
     isOpen: false,
     childComponent: null,

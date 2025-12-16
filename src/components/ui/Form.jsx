@@ -120,28 +120,49 @@ const FileInput = ({
   name,
   validation = {}, // errors được xử lý ở Form.jsx
   multiple = false, // Thêm prop multiple
-  data = [],
+  defaultValue = [],
 }) => {
-  const [previews, setPreviews] = useState(
-    data.map((item) => formatImageUrl(item)) || []
-  ); // Thay đổi thành mảng để lưu nhiều ảnh preview
+  // Khởi tạo previews từ data có sẵn (ảnh cũ từ initialData)
+  const initialPreviews = Array.isArray(defaultValue) && defaultValue.length > 0
+    ? defaultValue.map((item) => {
+        // Nếu item là object với url property
+        if (typeof item === 'object' && item.url) {
+          return formatImageUrl(item.url);
+        }
+        // Nếu item là string url
+        return formatImageUrl(item);
+      })
+    : [];
+
+  const [previews, setPreviews] = useState(initialPreviews);
+  const [hasNewImages, setHasNewImages] = useState(false);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files); // Chuyển FileList thành Array
     if (files.length > 0) {
       const newPreviews = files.map((file) => URL.createObjectURL(file));
       setPreviews(newPreviews);
+      setHasNewImages(true);
     } else {
-      setPreviews([]);
+      // Nếu không chọn file mới, giữ ảnh cũ
+      setPreviews(initialPreviews);
+      setHasNewImages(false);
     }
   };
 
-  // Dọn dẹp các Object URL để tránh rò rỉ bộ nhớ
+  // Dọn dẹp các Object URL để tránh rò rỉ bộ nhớ (chỉ revoke URL mới tạo)
   useEffect(() => {
     return () => {
-      previews.forEach((url) => URL.revokeObjectURL(url));
+      if (hasNewImages) {
+        previews.forEach((url) => {
+          // Chỉ revoke blob URLs (URL.createObjectURL)
+          if (url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+          }
+        });
+      }
     };
-  }, [previews]);
+  }, [previews, hasNewImages]);
 
   return (
     <div className="">
@@ -154,20 +175,32 @@ const FileInput = ({
         {...register(name, {
           ...validation,
           onChange: handleFileChange,
+          required: false, // Không bắt buộc khi edit vì đã có ảnh cũ
         })}
       />
-      {previews.length > 0 && ( // Kiểm tra previews.length
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {" "}
-          {/* Hiển thị nhiều ảnh preview */}
-          {previews.map((src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`Preview ${index}`}
-              className="h-24 w-24 object-cover rounded-md"
-            />
-          ))}
+      {previews.length > 0 && (
+        <div className="mt-2">
+          {!hasNewImages && initialPreviews.length > 0 && (
+            <p className="text-sm text-gray-600 mb-2">
+              Ảnh hiện tại ({previews.length} ảnh):
+            </p>
+          )}
+          {hasNewImages && (
+            <p className="text-sm text-green-600 mb-2">
+              Ảnh mới được chọn ({previews.length} ảnh):
+            </p>
+          )}
+          <div className="grid grid-cols-3 gap-2">
+            {previews.map((src, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={src}
+                  alt={`Preview ${index}`}
+                  className="h-24 w-24 object-cover rounded-md border-2 border-gray-300"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -215,7 +248,7 @@ const FormField = ({
             register={register}
             validation={validation}
             multiple={multiple} // Truyền prop multiple
-            // data={data || []}
+            defaultValue={defaultValue}
           />
         );
       default:
