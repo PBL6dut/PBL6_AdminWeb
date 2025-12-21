@@ -16,13 +16,14 @@ import {
 import { IconButton } from "../components/ui/Button";
 import { useContext } from "react";
 import ModalContext from "../contexts/ModalContext";
-import { OpenProductFormModal } from "./onEditConfigs";
+import { OpenOrderFormModal, OpenProductFormModal } from "./onEditConfigs";
 import {
   useDeleteProductMutation,
   useUpdateProductMutation,
 } from "../services/product.api";
 import { OpenConfirmDeleteProductModal } from "./onDeleteConfigs";
 import { buildProductFormData } from "../utils/form.utils";
+import { useCancelOrderMutation } from "../services/order.api";
 
 export const GetProductColumns = (categories = []) => {
   const { openModal, closeModal } = useContext(ModalContext);
@@ -219,7 +220,8 @@ export const GetCustomerColumns = () => {
 };
 
 export const GetOrderColumns = () => {
-  const { openModal } = useContext(ModalContext);
+  const { openModal, closeModal } = useContext(ModalContext);
+  const [cancelOrder, cancelResult] = useCancelOrderMutation();
   const getStatusBadge = (status) => {
     switch (status) {
       case "pending":
@@ -290,12 +292,20 @@ export const GetOrderColumns = () => {
             iconType="view"
             handleClick={() => OpenOrderDetailModal(item, openModal)}
           />
-          {/* <IconButton
+           <IconButton
             iconType="edit"
-            // handleClick={() => onViewConfigs({ object: item })}
+            handleClick={() => OpenOrderFormModal(openModal, closeModal, item, async (formData) => {
+              try {
+                if (formData.status === 'cancelled') {
+                  await cancelOrder(item.id).unwrap().then(() => closeModal());
+                }
+              } catch (error) {
+                console.error("Cập nhật trạng thái thất bại:", error);
+              }
+            })}
           />
 
-          <IconButton
+          {/* <IconButton
             iconType="delete"
             // handleClick={() => onViewConfigs({ object: item })}
           /> */}

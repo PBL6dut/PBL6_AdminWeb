@@ -130,3 +130,21 @@ export const getProductFormSchema = (initialValues, categories=[]) => {
   }
 }
 
+export const getOrderFormSchema = (initialValues) => {
+  return {
+    status: {
+      name: "status",
+      label: "Trạng thái đơn hàng",
+      type: "select",
+      options: [
+        { value: "pending", label: "Chờ xử lý" },
+        { value: "confirmed", label: "Đã xác nhận" },
+        { value: "shipping", label: "Đang giao" },
+        { value: "completed", label: "Hoàn thành" },
+        { value: "cancelled", label: "Đã huỷ" },
+      ],
+      defaultValue: initialValues?.status || "pending",
+    },
+  }
+}
+

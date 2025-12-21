@@ -40,6 +40,18 @@ export const orderApi = apiSlice.injectEndpoints({
       providesTags: ["Orders"],
       transformResponse: (response) => response.data,
     }),
+    getOrderStatistics: builder.query({
+      query: () => "/orders/statistics",
+      providesTags: ["Orders"],
+      transformResponse: (response) => response.data,
+    }),
+    cancelOrder: builder.mutation({
+      query: (id) => ({
+        url: `/orders/cancel/${id}`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["Orders"],
+    }),
   }),
   overrideExisting: false,
 });
@@ -51,4 +63,6 @@ export const {
   useUpdateOrderMutation,
   useCountOrdersQuery,
   useGetTotalIncomeQuery,
+  useCancelOrderMutation,
+  useGetOrderStatisticsQuery,
 } = orderApi;

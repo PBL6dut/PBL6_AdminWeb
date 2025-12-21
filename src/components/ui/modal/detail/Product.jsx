@@ -164,6 +164,23 @@ const Product = ({ item }) => {
     const { order_details } = item || [];
     const orders = order_details?.map((detail) => detail.order) || [];
 
+    const getStatusBadge = (status) => {
+      switch (status) {
+        case "pending":
+          return <StatusBadge variant="yellow">Chờ xử lý</StatusBadge>;
+        case "shipping":
+          return <StatusBadge variant="orange">Đang giao</StatusBadge>;
+        case "completed":
+          return <StatusBadge variant="green">Hoàn thành</StatusBadge>;
+        case "cancelled":
+          return <StatusBadge variant="red">Đã huỷ</StatusBadge>;
+        case "confirmed":
+          return <StatusBadge variant="green">Đã xác nhận</StatusBadge>;
+        default:
+          return <StatusBadge variant="gray">Không xác định</StatusBadge>;
+      }
+    };
+
     if (!order_details || order_details.length === 0) {
       return <p>Sản phẩm chưa có đơn hàng nào.</p>;
     }
@@ -208,7 +225,7 @@ const Product = ({ item }) => {
                   {formatPrice(order.total_amount)}
                 </td>
                 <td className="px-4 py-2 border-b border-gray-300">
-                  <StatusBadge>{order.status}</StatusBadge>
+                  {getStatusBadge(order.status)}
                 </td>
               </tr>
             ))}

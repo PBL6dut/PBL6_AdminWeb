@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { StatisticsCard } from "../components/ui/Card";
 import Customer from "../components/ui/modal/detail/Customer";
-import { useGetOrdersQuery } from "../services/order.api";
+import { useGetOrdersQuery, useGetOrderStatisticsQuery } from "../services/order.api";
 import { getOrderStats } from "../configs/cardConfigs";
 
 const OrderPage = () => {
@@ -18,7 +18,9 @@ const OrderPage = () => {
 
   const { data, isLoading, error } = useGetOrdersQuery({ page });
   const orders = data?.data || [];
-  const stats = getOrderStats(orders);
+  const { data: statsData, isLoading: isStatsLoading, error: statsError } = useGetOrderStatisticsQuery();
+  console.log(statsData);
+  const stats = getOrderStats(statsData);
   const columns = GetOrderColumns();
   const { pagination } = data || {};
 

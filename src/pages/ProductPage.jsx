@@ -5,6 +5,7 @@ import {
   useCreateProductMutation,
   useGetCategoriesQuery,
   useGetProductsQuery,
+  useGetStatisticsQuery,
 } from "../services/product.api";
 import { SearchInput } from "../components/ui/SearchInput";
 import { Table } from "../components/ui/Table";
@@ -32,7 +33,9 @@ const ProductPage = () => {
   const products = data?.data || [];
   const categories = categoriesData;
 
-  const stats = getProductStats(products);
+  const { data: statsData, isLoading: isStatsLoading, error: statsError } = useGetStatisticsQuery();
+  console.log(statsData);
+  const stats = getProductStats(statsData);
 
   const columns = GetProductColumns(categories);
   const { pagination } = data || {};
@@ -62,7 +65,7 @@ const ProductPage = () => {
     },
   };
 
-  if (isLoading || isFetching || isCategoriesLoading) {
+  if (isLoading || isFetching || isCategoriesLoading || isStatsLoading) {
     // Bạn cũng có thể thêm kiểm tra 'error' ở đây để hiển thị thông báo lỗi
     return <LoadingSpinner />;
   }

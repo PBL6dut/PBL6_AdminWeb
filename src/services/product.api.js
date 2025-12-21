@@ -40,6 +40,11 @@ export const productApi = apiSlice.injectEndpoints({
       providesTags: ["Products"],
       transformResponse: (response) => response.data,
     }),
+    getStatistics: builder.query({
+      query: () => "/products/statistics",
+      providesTags: ["Products"],
+      transformResponse: (response) => response.data,
+    }),
     createProduct: builder.mutation({
       query: (productData) => ({
         url: "/products",
@@ -81,4 +86,5 @@ export const {
   useUpdateProductMutation,
   useDeleteProductMutation,
   useGetMostProductsByCategoryQuery,
+  useGetStatisticsQuery,
 } = productApi;

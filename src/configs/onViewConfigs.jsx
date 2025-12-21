@@ -13,7 +13,7 @@ export const OpenOrderDetailModal = (item, openModal) => {
 };
 
 export const OpenCustomerDetailModal = (item, openModal) => {
-  return openModal(<CustomerModal item={item} />, "Chi tiết khách hàng", "lg");
+  return openModal(<CustomerModal item={item} />, "Chi tiết khách hàng", "xl");
 };
 
 // export default onViewConfigs;

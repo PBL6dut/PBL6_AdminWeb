@@ -1,5 +1,5 @@
 import { Form } from "../components/ui/Form";
-import { getProductFormSchema } from "./formConfigs";
+import { getOrderFormSchema, getProductFormSchema } from "./formConfigs";
 
 
 export const OpenProductFormModal = (openModal, closeModal, item, onSubmit, categories=[]) => {
@@ -8,5 +8,14 @@ export const OpenProductFormModal = (openModal, closeModal, item, onSubmit, cate
     <Form formSchema={formSchema} onClose={closeModal} onSubmit={onSubmit} />,
     "Chỉnh sửa thông tin sản phẩm",
     "lg"
+  );
+};
+
+export const OpenOrderFormModal = (openModal, closeModal, item, onSubmit) => {
+  const formSchema = getOrderFormSchema(item);
+  return openModal(
+    <Form formSchema={formSchema} onSubmit={onSubmit} onClose={closeModal} />,
+    "Chỉnh sửa trạng thái đơn hàng",
+    "md"
   );
 };
